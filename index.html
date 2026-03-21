@@ -1,9 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BIBIS — L'Application</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect fill='%23E8232A' width='64' height='64' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='24' font-weight='bold' font-family='sans-serif'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="icon" type="image/png" href="assets/bibis-icon.png">
 <link rel="apple-touch-icon" href="assets/bibis-icon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -189,7 +190,7 @@ select.form-input option{background:var(--gris);}
 
 <!-- LOGIN -->
 <div id="loginScreen">
-  <img src="assets/bibis-icon.png" alt="BIBIS" class="login-hero-img" onerror="this.style.display='none'">
+  <img src="assets/bibis-icon.png" alt="BIBIS" class="login-hero-img" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22%3E%3Crect fill=%22%23E8232A%22 width=%22140%22 height=%22140%22 rx=%2220%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2222%22 font-weight=%22bold%22%3EBIBIS%3C/text%3E%3C/svg%3E'">
   <div class="login-logo">BIBIS</div>
   <div class="login-sub">L'Application</div>
   <div class="login-card">
@@ -668,7 +669,7 @@ window.saveProfil=()=>{const p={nom:$('iNom').value||cu?.pseudo||'Bibis',age:par
 function refreshProfil(){const p=state.profil;$('iNom').value=p.nom||'';$('iAge').value=p.age||'';$('iPoids').value=p.poids||'';$('iTaille').value=p.taille||'';$('iSexe').value=p.sexe||'H';$('iAct').value=p.activite||1.55;$('iObj').value=p.objectif||'surplus';const keyInp=$('iAnthropicKey');if(keyInp){keyInp.value='';keyInp.placeholder=localStorage.getItem(ANTHROPIC_KEY_STORAGE)?'✓ Clé enregistrée — saisir pour modifier':'sk-ant-...';}$('profilAvatar').textContent=cu?.avatar||'💪';$('profilName').textContent=(p.nom||cu?.pseudo||'Bibis').toUpperCase();const lbls={deficit:'Perte de poids',maintien:'Maintien',surplus:'Prise de masse',surplus2:'Prise de masse agressive'};$('profilGoalLbl').textContent='Objectif : '+(lbls[p.objectif]||'Prise de masse');if(p.poids&&p.taille&&p.age){const bmr=calcBMR(p),tdee=calcTDEE(p),imc=(p.poids/(p.taille/100)**2).toFixed(1),kc=applyObj(tdee,p.objectif);$('sPoids').textContent=p.poids;$('sIMC').textContent=imc;$('sBMR').textContent=bmr;$('sTDEE').textContent=kc;}}
 
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o&&o.id)closeModal(o.id);});});
-$('loginBtn')?.addEventListener('click',()=>doLogin());
+document.addEventListener('click',e=>{if(e.target.closest('#loginBtn'))doLogin();});
 $('loginPseudo')?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 loadAnthropicKey();
 showLogin();
