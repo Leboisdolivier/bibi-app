@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BIBIS — L'Application</title>
+<link rel="icon" type="image/png" href="assets/bibis-icon.png">
+<link rel="apple-touch-icon" href="assets/bibis-icon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <style>
@@ -13,6 +15,7 @@
 body{background:var(--fond);color:var(--blanc);font-family:'Barlow',sans-serif;min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden;}
 #loginScreen{position:fixed;inset:0;background:linear-gradient(160deg,#1a0a0a 0%,#0a1628 50%,#1a1a0a 100%);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;overflow-y:auto;}
 .login-logo{font-family:'Bebas Neue',cursive;font-size:72px;color:var(--blanc);letter-spacing:4px;text-shadow:4px 4px 0 var(--noir),-2px -2px 0 var(--jaune);line-height:1;text-align:center;}
+.login-hero-img{width:140px;height:140px;object-fit:cover;border-radius:20px;margin-bottom:16px;border:3px solid var(--jaune);box-shadow:0 4px 20px rgba(0,0,0,0.4);}
 .login-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--jaune);text-transform:uppercase;margin-bottom:36px;}
 .login-card{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:24px;}
 .login-title{font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:1px;margin-bottom:16px;text-align:center;}
@@ -186,6 +189,7 @@ select.form-input option{background:var(--gris);}
 
 <!-- LOGIN -->
 <div id="loginScreen">
+  <img src="assets/bibis-icon.png" alt="BIBIS" class="login-hero-img" onerror="this.style.display='none'">
   <div class="login-logo">BIBIS</div>
   <div class="login-sub">L'Application</div>
   <div class="login-card">
@@ -198,7 +202,7 @@ select.form-input option{background:var(--gris);}
       <div class="login-title">Choisis ton avatar</div>
       <div class="avatar-grid" id="avatarGrid"></div>
       <input type="text" class="login-input" id="loginPseudo" placeholder="Ton pseudo" maxlength="20" autocomplete="off">
-      <button class="login-btn" onclick="doLogin()">C'EST PARTI 💪</button>
+      <button type="button" class="login-btn" id="loginBtn">C'EST PARTI 💪</button>
     </div>
   </div>
 </div>
@@ -504,7 +508,7 @@ const firebaseConfig={
 let db=null,fbOK=false;
 try{const app=initializeApp(firebaseConfig);db=getFirestore(app);fbOK=true;}catch(e){console.warn('Firebase non configuré');}
 
-const AVATARS=['💪','🏋️','🦁','🐺','🔥','⚡','🦅','🐯','🏆','🎯','💥','🌟'];
+const AVATARS=['💪','🐯','🐺','🔥','⚡','🦅','🦁','🏆','🎯','💥','🌟','😎'];
 const REPAS=[{id:'petit-dej',label:'☀️ Petit-déjeuner'},{id:'dejeuner',label:'🥗 Déjeuner'},{id:'diner',label:'🌙 Dîner'},{id:'snacks',label:'🍎 Snacks'}];
 const EX_DB=[
   {id:'bpb',nom:'Développé couché',emoji:'🏋️',muscle:'Pectoraux'},
@@ -545,8 +549,9 @@ window.selAv=(el,e)=>{document.querySelectorAll('.av-opt').forEach(x=>x.classLis
 function getAv(){return document.querySelector('.av-opt.sel')?.textContent||'💪';}
 
 async function showLogin(){$('loginScreen').style.display='flex';$('appContainer').style.display='none';initAvGrid();await fbLoadProfs();if(allProf.length){$('existingProfiles').style.display='block';$('profilesList').innerHTML=allProf.map(p=>`<div class="profile-item" onclick="loginAs('${p.pseudo.replace(/'/g,"\\'")}','${p.avatar}')"><div style="font-size:30px">${p.avatar}</div><div><div style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px">${p.pseudo}</div><div style="font-size:10px;color:rgba(255,255,255,0.35)">Appuie pour te connecter</div></div><span style="color:rgba(255,255,255,0.18);font-size:18px">›</span></div>`).join('');}else{$('existingProfiles').style.display='none';}}
-window.doLogin=async()=>{const pseudo=$('loginPseudo').value.trim();if(!pseudo){toast('Saisis ton pseudo !');return;}await loginAs(pseudo,getAv(),true);};
-window.loginAs=async(pseudo,avatar,isNew=false)=>{cu={pseudo,avatar};$('hdrAvatar').textContent=avatar;$('hdrUsername').textContent=pseudo.toUpperCase();const fbL=await fbLoad();if(!fbL)lLoad();if(isNew){state.avatar=avatar;state.pseudo=pseudo;}loadAnthropicKey();fbSave();$('loginScreen').style.display='none';$('appContainer').style.display='block';refreshAll();};
+async function doLogin(){try{const pseudo=($('loginPseudo')?.value||'').trim();if(!pseudo){toast('Saisis ton pseudo !');return;}await loginAs(pseudo,getAv(),true);}catch(err){console.error(err);toast('Erreur : '+err.message);}}
+window.doLogin=doLogin;
+window.loginAs=async(pseudo,avatar,isNew=false)=>{try{cu={pseudo,avatar};$('hdrAvatar').textContent=avatar;$('hdrUsername').textContent=pseudo.toUpperCase();const fbL=await fbLoad();if(!fbL)lLoad();if(isNew){state.avatar=avatar;state.pseudo=pseudo;}loadAnthropicKey();fbSave();$('loginScreen').style.display='none';$('appContainer').style.display='block';refreshAll();}catch(err){console.error(err);toast('Erreur : '+err.message);}};
 window.logout=()=>{fbSave();cu=null;state={profil:{nom:'',age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:''};showLogin();};
 
 window.showScreen=name=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));$(`screen-${name}`).classList.add('active');$(`nav-${name}`).classList.add('active');if(name==='nutrition')refreshNut();if(name==='profil')refreshProfil();if(name==='sport')refreshSport();if(name==='body')refreshBody();};
@@ -663,6 +668,8 @@ window.saveProfil=()=>{const p={nom:$('iNom').value||cu?.pseudo||'Bibis',age:par
 function refreshProfil(){const p=state.profil;$('iNom').value=p.nom||'';$('iAge').value=p.age||'';$('iPoids').value=p.poids||'';$('iTaille').value=p.taille||'';$('iSexe').value=p.sexe||'H';$('iAct').value=p.activite||1.55;$('iObj').value=p.objectif||'surplus';const keyInp=$('iAnthropicKey');if(keyInp){keyInp.value='';keyInp.placeholder=localStorage.getItem(ANTHROPIC_KEY_STORAGE)?'✓ Clé enregistrée — saisir pour modifier':'sk-ant-...';}$('profilAvatar').textContent=cu?.avatar||'💪';$('profilName').textContent=(p.nom||cu?.pseudo||'Bibis').toUpperCase();const lbls={deficit:'Perte de poids',maintien:'Maintien',surplus:'Prise de masse',surplus2:'Prise de masse agressive'};$('profilGoalLbl').textContent='Objectif : '+(lbls[p.objectif]||'Prise de masse');if(p.poids&&p.taille&&p.age){const bmr=calcBMR(p),tdee=calcTDEE(p),imc=(p.poids/(p.taille/100)**2).toFixed(1),kc=applyObj(tdee,p.objectif);$('sPoids').textContent=p.poids;$('sIMC').textContent=imc;$('sBMR').textContent=bmr;$('sTDEE').textContent=kc;}}
 
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o&&o.id)closeModal(o.id);});});
+$('loginBtn')?.addEventListener('click',()=>doLogin());
+$('loginPseudo')?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 loadAnthropicKey();
 showLogin();
 </script>
