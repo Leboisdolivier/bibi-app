@@ -493,10 +493,50 @@ select.form-input option{background:var(--gris);}
 
 <div class="toast" id="toast"></div>
 
+<!-- Bootstrap login : s'exécute en premier, sans dépendances externes -->
+<script>
+(function(){
+  var AVATARS=['💪','🐯','🐺','🔥','⚡','🦅','🦁','🏆','🎯','💥','🌟','😎'];
+  function getSel(){var s=document.querySelector('.av-opt.sel');return s?s.textContent:'💪';}
+  function doLoginFallback(){
+    var inp=document.getElementById('loginPseudo');
+    var pseudo=(inp&&inp.value?inp.value:'').trim();
+    if(!pseudo){var t=document.getElementById('toast');if(t){t.textContent='Saisis ton pseudo !';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}return;}
+    var avatar=getSel();
+    try{
+      localStorage.setItem('bibis_current',JSON.stringify({pseudo:pseudo,avatar:avatar}));
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('appContainer').style.display='block';
+      var hA=document.getElementById('hdrAvatar');if(hA)hA.textContent=avatar;
+      var hU=document.getElementById('hdrUsername');if(hU)hU.textContent=pseudo.toUpperCase();
+    }catch(e){alert('Erreur: '+e.message);}
+  }
+  function init(){
+    var g=document.getElementById('avatarGrid');
+    if(g){
+      g.innerHTML=AVATARS.map(function(a,i){return'<div class="av-opt'+(i===0?' sel':'')+'" data-idx="'+i+'">'+a+'</div>';}).join('');
+      g.querySelectorAll('.av-opt').forEach(function(el){
+        el.addEventListener('click',function(){g.querySelectorAll('.av-opt').forEach(function(x){x.classList.remove('sel');});el.classList.add('sel');});
+      });
+    }
+    var btn=document.getElementById('loginBtn');
+    if(btn)btn.addEventListener('click',function(){
+      if(typeof window.doLogin==='function')window.doLogin();
+      else doLoginFallback();
+    });
+    var inp=document.getElementById('loginPseudo');
+    if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter'){if(typeof window.doLogin==='function')window.doLogin();else doLoginFallback();}});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
+window.BIBIS_READY=false;
 (function(){
+try{
 const firebaseConfig={
   apiKey:"AIzaSyCc9qUv1yhcqSpJaCwb7LQ0BR5m4Lus6F8",
   authDomain:"bibis-app.firebaseapp.com",
@@ -668,9 +708,9 @@ window.saveProfil=()=>{const p={nom:$('iNom').value||cu?.pseudo||'Bibis',age:par
 function refreshProfil(){const p=state.profil;$('iNom').value=p.nom||'';$('iAge').value=p.age||'';$('iPoids').value=p.poids||'';$('iTaille').value=p.taille||'';$('iSexe').value=p.sexe||'H';$('iAct').value=p.activite||1.55;$('iObj').value=p.objectif||'surplus';const keyInp=$('iAnthropicKey');if(keyInp){keyInp.value='';keyInp.placeholder=localStorage.getItem(ANTHROPIC_KEY_STORAGE)?'✓ Clé enregistrée — saisir pour modifier':'sk-ant-...';}$('profilAvatar').textContent=cu?.avatar||'💪';$('profilName').textContent=(p.nom||cu?.pseudo||'Bibis').toUpperCase();const lbls={deficit:'Perte de poids',maintien:'Maintien',surplus:'Prise de masse',surplus2:'Prise de masse agressive'};$('profilGoalLbl').textContent='Objectif : '+(lbls[p.objectif]||'Prise de masse');if(p.poids&&p.taille&&p.age){const bmr=calcBMR(p),tdee=calcTDEE(p),imc=(p.poids/(p.taille/100)**2).toFixed(1),kc=applyObj(tdee,p.objectif);$('sPoids').textContent=p.poids;$('sIMC').textContent=imc;$('sBMR').textContent=bmr;$('sTDEE').textContent=kc;}}
 
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o&&o.id)closeModal(o.id);});});
-document.addEventListener('click',e=>{if(e.target.closest('#loginBtn'))doLogin();});
-var loginPseudoEl=document.getElementById('loginPseudo');if(loginPseudoEl)loginPseudoEl.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 loadAnthropicKey();
 showLogin();
+window.BIBIS_READY=true;
+}catch(e){console.error('BIBIS init error:',e);window.doLogin=function(){alert('Erreur de chargement. Recharge la page.');};}
 })();
 </script>
