@@ -699,6 +699,34 @@ window.BIBIS_READY=true;
 }catch(e){console.error('BIBIS init error:',e);window.doLogin=function(){alert('Erreur de chargement. Recharge la page.');};}
 })();
 </script>
+<!-- CHRONO autonome : s'exécute en dernier, garantit le fonctionnement -->
+<script>
+(function(){
+  var g=document.getElementById.bind(document);
+  var toastFn=function(m){var t=g('toast');if(t){t.textContent=m;t.className='toast show';setTimeout(function(){t.className='toast';},2200);}};
+  var swI=null,swRun=false,swMs=0,laps=[];
+  var cdI=null,cdRun=false,cdRem=30,cdTotal=30;
+  var restI=null;
+  function fmtTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+  function fmtMs(ms){var m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),cs=Math.floor((ms%1000)/10);return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+String(cs).padStart(2,'0');}
+  function renderSW(){var el=g('swDisplay');if(el)el.innerHTML=String(Math.floor(swMs/60000)).padStart(2,'0')+':'+String(Math.floor((swMs%60000)/1000)).padStart(2,'0')+'<span class="chrono-ms">:'+String(Math.floor((swMs%1000)/10)).padStart(2,'0')+'</span>';}
+  function renderCD(){var el=g('cdDisplay');if(el)el.textContent=fmtTime(cdRem);}
+  function setMode(mode){
+    var card=document.getElementById('screen-chrono');
+    if(card){var tabs=card.querySelectorAll('.mode-tab');tabs.forEach(function(t,i){t.classList.toggle('active',i===(mode==='sw'?0:1));});}
+    var sp=g('swPanel'),cp=g('cdPanel');if(sp)sp.style.display=mode==='sw'?'block':'none';if(cp)cp.style.display=mode==='cd'?'block':'none';
+  }
+  function swToggle(){if(swRun){clearInterval(swI);swRun=false;var b=g('swBtn');if(b)b.textContent='REPRENDRE';}else{swRun=true;var b=g('swBtn');if(b)b.textContent='PAUSE';swI=setInterval(function(){swMs+=10;renderSW();},10);}}
+  function swReset(){clearInterval(swI);swRun=false;swMs=0;laps=[];renderSW();var b=g('swBtn');if(b)b.textContent='START';var lc=g('lapsCard');if(lc)lc.style.display='none';}
+  function swLap(){if(!swRun)return;laps.push(swMs);var lc=g('lapsCard'),ll=g('lapsList');if(lc)lc.style.display='block';if(ll){var html='';for(var i=laps.length-1;i>=0;i--){html+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px"><span style="color:rgba(255,255,255,0.38);font-weight:700">Tour '+(laps.length-i)+'</span><span style="font-family:\'Bebas Neue\',cursive;font-size:14px">'+fmtMs(laps[i])+'</span></div>';}ll.innerHTML=html;}}
+  function setCD(secs,el){var cp=g('cdPanel');if(cp){var presets=cp.querySelectorAll('.preset-btn');presets.forEach(function(b){b.classList.remove('active');});if(el)el.classList.add('active');}cdRem=secs;cdTotal=secs;var m=g('cdMin'),s=g('cdSec');if(m)m.value=Math.floor(secs/60);if(s)s.value=secs%60;renderCD();}
+  function cdToggle(){if(cdRun){clearInterval(cdI);cdRun=false;var b=g('cdBtn');if(b)b.textContent='REPRENDRE';}else{var m=g('cdMin'),s=g('cdSec');var mn=parseInt(m&&m.value||0,10)||0,sc=parseInt(s&&s.value||0,10)||0;if(!cdRun&&cdRem===cdTotal){cdTotal=Math.max(1,mn*60+sc);cdRem=cdTotal;}cdRun=true;var b=g('cdBtn');if(b)b.textContent='PAUSE';cdI=setInterval(function(){cdRem--;if(cdRem<=0){clearInterval(cdI);cdRun=false;cdRem=0;var b=g('cdBtn');if(b)b.textContent='START';toastFn('⏰ Temps écoulé !');}renderCD();},1000);}}
+  function cdReset(){clearInterval(cdI);cdRun=false;var m=g('cdMin'),s=g('cdSec');var mn=parseInt(m&&m.value||0,10)||0,sc=parseInt(s&&s.value||0,10)||0;cdTotal=Math.max(1,mn*60+sc);cdRem=cdTotal;var b=g('cdBtn');if(b)b.textContent='START';renderCD();}
+  function startRest(secs){clearInterval(restI);var r=secs;var rd=g('restDisplay');if(rd){rd.style.display='block';rd.textContent=r;}restI=setInterval(function(){r--;if(rd)rd.textContent=r;if(r<=0){clearInterval(restI);if(rd){rd.textContent='GO!';rd.style.display='block';}toastFn('💪 GO !');setTimeout(function(){if(rd)rd.style.display='none';},1800);}},1000);}
+  window.setMode=setMode;window.swToggle=swToggle;window.swReset=swReset;window.swLap=swLap;window.setCD=setCD;window.cdToggle=cdToggle;window.cdReset=cdReset;window.startRest=startRest;
+  var cdMinEl=g('cdMin'),cdSecEl=g('cdSec');function cdInputSync(){if(!cdRun){var mn=parseInt(cdMinEl&&cdMinEl.value||0,10)||0,sc=parseInt(cdSecEl&&cdSecEl.value||0,10)||0;cdRem=mn*60+sc;cdTotal=cdRem;renderCD();}}if(cdMinEl)cdMinEl.oninput=cdInputSync;if(cdSecEl)cdSecEl.oninput=cdInputSync;
+})();
+</script>
 <!-- Bootstrap final : session, nav, login - s'exécute en dernier -->
 <script>
 (function(){
