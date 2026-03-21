@@ -212,17 +212,17 @@ select.form-input option{background:var(--gris);}
 <div id="appContainer" style="display:none">
 <div class="header">
   <div><div class="header-logo">BIBIS</div><div class="header-sub">L'Application</div></div>
-  <div class="header-user" onclick="logout()">
+  <div class="header-user" id="headerUserLogout">
     <div style="font-size:24px" id="hdrAvatar">💪</div>
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.82)" id="hdrUsername">—</div>
   </div>
 </div>
 <nav class="nav">
-  <button class="nav-btn active" onclick="showScreen('nutrition')" id="nav-nutrition"><span class="ic">🥗</span>NUTRI</button>
-  <button class="nav-btn" onclick="showScreen('chrono')" id="nav-chrono"><span class="ic">⏱️</span>CHRONO</button>
-  <button class="nav-btn" onclick="showScreen('sport')" id="nav-sport"><span class="ic">💪</span>SPORT</button>
-  <button class="nav-btn" onclick="showScreen('body')" id="nav-body"><span class="ic">📊</span>CORPS</button>
-  <button class="nav-btn" onclick="showScreen('profil')" id="nav-profil"><span class="ic">👤</span>PROFIL</button>
+  <button class="nav-btn active" id="nav-nutrition" type="button"><span class="ic">🥗</span>NUTRI</button>
+  <button class="nav-btn" id="nav-chrono" type="button"><span class="ic">⏱️</span>CHRONO</button>
+  <button class="nav-btn" id="nav-sport" type="button"><span class="ic">💪</span>SPORT</button>
+  <button class="nav-btn" id="nav-body" type="button"><span class="ic">📊</span>CORPS</button>
+  <button class="nav-btn" id="nav-profil" type="button"><span class="ic">👤</span>PROFIL</button>
 </nav>
 
 <!-- NUTRITION -->
@@ -505,10 +505,14 @@ select.form-input option{background:var(--gris);}
     var avatar=getSel();
     try{
       localStorage.setItem('bibis_current',JSON.stringify({pseudo:pseudo,avatar:avatar}));
+      var defState={profil:{nom:pseudo,age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:''};
+      if(!localStorage.getItem('bibis_'+pseudo))localStorage.setItem('bibis_'+pseudo,JSON.stringify(defState));
       document.getElementById('loginScreen').style.display='none';
       document.getElementById('appContainer').style.display='block';
       var hA=document.getElementById('hdrAvatar');if(hA)hA.textContent=avatar;
       var hU=document.getElementById('hdrUsername');if(hU)hU.textContent=pseudo.toUpperCase();
+      window.showScreen=window.showScreen||function(n){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});var s=document.getElementById('screen-'+n),nb=document.getElementById('nav-'+n);if(s)s.classList.add('active');if(nb)nb.classList.add('active');};
+      window.logout=window.logout||function(){localStorage.removeItem('bibis_current');location.reload();};
     }catch(e){alert('Erreur: '+e.message);}
   }
   function init(){
@@ -537,6 +541,9 @@ select.form-input option{background:var(--gris);}
 window.BIBIS_READY=false;
 (function(){
 try{
+window.showScreen=function(name){var alls=document.querySelectorAll('.screen'),allb=document.querySelectorAll('.nav-btn');if(alls)alls.forEach(function(s){s.classList.remove('active');});if(allb)allb.forEach(function(b){b.classList.remove('active');});var s=document.getElementById('screen-'+name),nb=document.getElementById('nav-'+name);if(s)s.classList.add('active');if(nb)nb.classList.add('active');};
+['nutrition','chrono','sport','body','profil'].forEach(function(n){var b=document.getElementById('nav-'+n);if(b)b.addEventListener('click',function(){if(typeof window.showScreen==='function')window.showScreen(n);});});
+var hu=document.getElementById('headerUserLogout');if(hu)hu.addEventListener('click',function(){if(typeof window.logout==='function')window.logout();});
 const firebaseConfig={
   apiKey:"AIzaSyCc9qUv1yhcqSpJaCwb7LQ0BR5m4Lus6F8",
   authDomain:"bibis-app.firebaseapp.com",
@@ -591,10 +598,10 @@ function getAv(){return document.querySelector('.av-opt.sel')?.textContent||'�
 async function showLogin(){$('loginScreen').style.display='flex';$('appContainer').style.display='none';initAvGrid();await fbLoadProfs();if(allProf.length){$('existingProfiles').style.display='block';const pl=$('profilesList');pl.innerHTML=allProf.map(p=>`<div class="profile-item" data-pseudo="${(p.pseudo||'').replace(/"/g,'&quot;')}" data-avatar="${(p.avatar||'💪').replace(/"/g,'&quot;')}"><div style="font-size:30px">${p.avatar}</div><div><div style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px">${p.pseudo}</div><div style="font-size:10px;color:rgba(255,255,255,0.35)">Appuie pour te connecter</div></div><span style="color:rgba(255,255,255,0.18);font-size:18px">›</span></div>`).join('');pl.querySelectorAll('.profile-item').forEach(el=>{el.addEventListener('click',()=>{const a=el.dataset.avatar||'💪';loginAs(el.dataset.pseudo||'',a);});});}else{$('existingProfiles').style.display='none';}}
 async function doLogin(){try{const pseudo=($('loginPseudo')?.value||'').trim();if(!pseudo){toast('Saisis ton pseudo !');return;}await loginAs(pseudo,getAv(),true);}catch(err){console.error(err);toast('Erreur : '+err.message);}}
 window.doLogin=doLogin;
-window.loginAs=async(pseudo,avatar,isNew=false)=>{try{cu={pseudo,avatar};$('hdrAvatar').textContent=avatar;$('hdrUsername').textContent=pseudo.toUpperCase();const fbL=await fbLoad();if(!fbL)lLoad();if(isNew){state.avatar=avatar;state.pseudo=pseudo;}loadAnthropicKey();fbSave();$('loginScreen').style.display='none';$('appContainer').style.display='block';refreshAll();}catch(err){console.error(err);toast('Erreur : '+err.message);}};
-window.logout=()=>{fbSave();cu=null;state={profil:{nom:'',age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:''};showLogin();};
+window.loginAs=async(pseudo,avatar,isNew=false)=>{try{cu={pseudo,avatar};localStorage.setItem('bibis_current',JSON.stringify({pseudo:pseudo,avatar:avatar}));$('hdrAvatar').textContent=avatar;$('hdrUsername').textContent=pseudo.toUpperCase();const fbL=await fbLoad();if(!fbL)lLoad();if(isNew){state.avatar=avatar;state.pseudo=pseudo;}loadAnthropicKey();fbSave();$('loginScreen').style.display='none';$('appContainer').style.display='block';refreshAll();}catch(err){console.error(err);toast('Erreur : '+err.message);}};
+window.logout=()=>{fbSave();localStorage.removeItem('bibis_current');cu=null;state={profil:{nom:'',age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:''};showLogin();};
 
-window.showScreen=name=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));$(`screen-${name}`).classList.add('active');$(`nav-${name}`).classList.add('active');if(name==='nutrition')refreshNut();if(name==='profil')refreshProfil();if(name==='sport')refreshSport();if(name==='body')refreshBody();};
+window.showScreen=name=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));var se=$('screen-'+name),nb=$('nav-'+name);if(se)se.classList.add('active');if(nb)nb.classList.add('active');if(name==='nutrition')refreshNut();if(name==='profil')refreshProfil();if(name==='sport')refreshSport();if(name==='body')refreshBody();};
 function refreshAll(){refreshNut();refreshProfil();refreshSport();renderStreak();}
 
 function getTotals(ds){const day=state.repas[ds]||{};let k=0,g=0,l=0,p=0;Object.values(day).forEach(items=>items.forEach(f=>{k+=f.kcal||0;g+=f.glucides||0;l+=f.lipides||0;p+=f.proteines||0;}));return{kcal:Math.round(k),g:Math.round(g),l:Math.round(l),p:Math.round(p)};}
@@ -672,8 +679,7 @@ window.cdToggle=()=>{if(cdRun){clearInterval(cdI);cdRun=false;$('cdBtn').textCon
 window.cdReset=()=>{clearInterval(cdI);cdRun=false;const m=parseInt($('cdMin').value)||0,s=parseInt($('cdSec').value)||0;cdTotal=Math.max(1,m*60+s);cdRem=cdTotal;$('cdBtn').textContent='START';renderCD();};
 function renderCD(){$('cdDisplay').textContent=fmtTime(cdRem);}
 window.startRest=secs=>{clearInterval(restI);let r=secs;$('restDisplay').style.display='block';$('restDisplay').textContent=r;restI=setInterval(()=>{r--;$('restDisplay').textContent=r;if(r<=0){clearInterval(restI);$('restDisplay').textContent='GO!';toast('💪 GO !');setTimeout(()=>$('restDisplay').style.display='none',1800);}},1000);};
-$('cdMin').addEventListener('input',()=>{if(!cdRun){cdRem=parseInt($('cdMin').value||0)*60+parseInt($('cdSec').value||0);renderCD();}});
-$('cdSec').addEventListener('input',()=>{if(!cdRun){cdRem=parseInt($('cdMin').value||0)*60+parseInt($('cdSec').value||0);renderCD();}});
+var cdMin=$('cdMin'),cdSec=$('cdSec');if(cdMin)cdMin.addEventListener('input',()=>{if(!cdRun){cdRem=parseInt($('cdMin').value||0)*60+parseInt($('cdSec').value||0);renderCD();}});if(cdSec)cdSec.addEventListener('input',()=>{if(!cdRun){cdRem=parseInt($('cdMin').value||0)*60+parseInt($('cdSec').value||0);renderCD();}});
 
 window.showSportTab=tab=>{document.querySelectorAll('.sport-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.sport-content').forEach(c=>c.classList.remove('active'));const btn=$('sportTab-'+tab);if(btn)btn.classList.add('active');$(`sport-${tab}`).classList.add('active');if(tab==='prog')renderProg();if(tab==='histo')renderHisto();};
 window.openWorkoutModal=()=>{selEx=[];$('workoutName').value='';$('selExBadges').innerHTML='';$('exercisePicker').innerHTML=EX_DB.map(e=>`<button class="ex-pick-btn" id="ep_${e.id}" onclick="togEx('${e.id}')">${e.emoji}<span>${e.nom}</span><span style="font-size:9px;color:rgba(255,255,255,0.3)">${e.muscle}</span></button>`).join('');$('workoutModal').classList.add('open');};
@@ -708,8 +714,15 @@ window.saveProfil=()=>{const p={nom:$('iNom').value||cu?.pseudo||'Bibis',age:par
 function refreshProfil(){const p=state.profil;$('iNom').value=p.nom||'';$('iAge').value=p.age||'';$('iPoids').value=p.poids||'';$('iTaille').value=p.taille||'';$('iSexe').value=p.sexe||'H';$('iAct').value=p.activite||1.55;$('iObj').value=p.objectif||'surplus';const keyInp=$('iAnthropicKey');if(keyInp){keyInp.value='';keyInp.placeholder=localStorage.getItem(ANTHROPIC_KEY_STORAGE)?'✓ Clé enregistrée — saisir pour modifier':'sk-ant-...';}$('profilAvatar').textContent=cu?.avatar||'💪';$('profilName').textContent=(p.nom||cu?.pseudo||'Bibis').toUpperCase();const lbls={deficit:'Perte de poids',maintien:'Maintien',surplus:'Prise de masse',surplus2:'Prise de masse agressive'};$('profilGoalLbl').textContent='Objectif : '+(lbls[p.objectif]||'Prise de masse');if(p.poids&&p.taille&&p.age){const bmr=calcBMR(p),tdee=calcTDEE(p),imc=(p.poids/(p.taille/100)**2).toFixed(1),kc=applyObj(tdee,p.objectif);$('sPoids').textContent=p.poids;$('sIMC').textContent=imc;$('sBMR').textContent=bmr;$('sTDEE').textContent=kc;}}
 
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o&&o.id)closeModal(o.id);});});
+async function tryRestoreSession(){
+  try{
+    const cur=localStorage.getItem('bibis_current');
+    if(cur){const j=JSON.parse(cur);if(j.pseudo&&j.avatar){cu={pseudo:j.pseudo,avatar:j.avatar};const fbL=await fbLoad();if(!fbL)lLoad();loadAnthropicKey();$('hdrAvatar').textContent=cu.avatar;$('hdrUsername').textContent=cu.pseudo.toUpperCase();$('loginScreen').style.display='none';$('appContainer').style.display='block';refreshAll();return true;}}
+  }catch(e){}
+  return false;
+}
 loadAnthropicKey();
-showLogin();
+tryRestoreSession().then(ok=>{if(!ok)showLogin();});
 window.BIBIS_READY=true;
 }catch(e){console.error('BIBIS init error:',e);window.doLogin=function(){alert('Erreur de chargement. Recharge la page.');};}
 })();
