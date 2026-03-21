@@ -555,7 +555,8 @@ function toast(m,d=2600){const t=$('toast');t.textContent=m;t.classList.add('sho
 function todayStr(d=new Date()){return d.toISOString().split('T')[0];}
 function fmtDate(d){const dy=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],mo=['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];return`${dy[d.getDay()]} ${d.getDate()} ${mo[d.getMonth()]}`;}
 function fmtTime(s){return`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
-function closeModal(id){$(id).classList.remove('open');stopScanner();}
+function closeModal(id){const el=$(id);if(el)el.classList.remove('open');stopScanner();}
+window.closeModal=closeModal;
 function showSync(s){const el=$('syncInd');el.textContent=s==='saving'?'● sync...':'● ok';el.className='sync-ind show '+(s==='saving'?'saving':'');if(s==='ok')setTimeout(()=>el.classList.remove('show'),1800);}
 
 async function fbLoad(){if(!fbOK||!cu)return false;try{const sn=await db.collection('bibis_users').doc(cu.pseudo).get();if(sn.exists){state={...state,...sn.data()};return true;}}catch(e){}return false;}
@@ -572,6 +573,7 @@ window.logout=()=>{fbSave();localStorage.removeItem('bibis_current');cu=null;sta
 
 window.showScreen=name=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));var se=$('screen-'+name),nb=$('nav-'+name);if(se)se.classList.add('active');if(nb)nb.classList.add('active');if(name==='nutrition')refreshNut();if(name==='profil')refreshProfil();if(name==='sport')refreshSport();if(name==='body')refreshBody();};
 function refreshAll(){refreshNut();refreshProfil();refreshSport();renderStreak();}
+window.refreshAll=refreshAll;window.refreshNut=refreshNut;window.refreshProfil=refreshProfil;window.refreshSport=refreshSport;window.refreshBody=refreshBody;
 
 function getTotals(ds){const day=state.repas[ds]||{};let k=0,g=0,l=0,p=0;Object.values(day).forEach(items=>items.forEach(f=>{k+=f.kcal||0;g+=f.glucides||0;l+=f.lipides||0;p+=f.proteines||0;}));return{kcal:Math.round(k),g:Math.round(g),l:Math.round(l),p:Math.round(p)};}
 window.nutChangeDay=d=>{nutDate=new Date(nutDate.getTime()+d*86400000);refreshNut();};
