@@ -76,6 +76,8 @@ body{background:var(--fond);color:var(--blanc);font-family:'Barlow',sans-serif;m
 .food-kcal{font-family:'Bebas Neue',cursive;font-size:17px;color:var(--orange);}
 .btn-del-food{background:none;border:none;color:rgba(255,255,255,0.2);font-size:17px;cursor:pointer;padding:3px;}
 .btn-add-food{display:flex;align-items:center;gap:6px;width:100%;padding:8px 11px;background:none;border:none;color:rgba(255,255,255,0.3);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-top:1px dashed rgba(255,255,255,0.07);}
+.btn-add-method{padding:12px 8px;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.1);border-radius:10px;color:white;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.btn-add-method:active,.btn-add-method:hover{background:rgba(255,214,0,0.12);border-color:var(--jaune);}
 .btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,var(--rouge),#C41B21);border:none;border-radius:10px;color:white;font-family:'Bebas Neue',cursive;font-size:19px;letter-spacing:2px;cursor:pointer;border:2px solid rgba(255,255,255,0.07);}
 .btn-secondary{width:100%;padding:12px;background:linear-gradient(135deg,var(--bleu),#0F3B8A);border:none;border-radius:10px;color:white;font-family:'Bebas Neue',cursive;font-size:19px;letter-spacing:2px;cursor:pointer;}
 .btn-green{width:100%;padding:12px;background:linear-gradient(135deg,var(--vert),#1a8f52);border:none;border-radius:10px;color:white;font-family:'Bebas Neue',cursive;font-size:19px;letter-spacing:2px;cursor:pointer;}
@@ -252,6 +254,24 @@ select.form-input option{background:var(--gris);}
       <div class="water-drops" id="waterDrops"></div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4)" id="waterLabel">0/8</div>
     </div>
+  </div>
+  <div class="card" style="margin-top:9px">
+    <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;margin-bottom:9px;color:rgba(255,255,255,0.7)">AJOUTER UN ALIMENT</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+      <button class="btn-add-method" onclick="openFoodModalFor('search')">
+        <span style="font-size:24px;display:block;margin-bottom:4px">🔍</span>
+        <span style="font-size:10px;font-weight:700">Recherche</span>
+      </button>
+      <button class="btn-add-method" onclick="openFoodModalFor('scan')">
+        <span style="font-size:24px;display:block;margin-bottom:4px">📷</span>
+        <span style="font-size:10px;font-weight:700">Scanner</span>
+      </button>
+      <button class="btn-add-method" onclick="openFoodModalFor('photo')">
+        <span style="font-size:24px;display:block;margin-bottom:4px">🤖</span>
+        <span style="font-size:10px;font-weight:700">Photo IA</span>
+      </button>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:7px">Code-barres • Photo de repas (clé API dans Profil)</div>
   </div>
   <div id="repasContainer"></div>
 </div>
@@ -592,7 +612,8 @@ function renderRepas(ds){
 window.togRepas=id=>{const b=$('rbody_'+id),c=$('chev_'+id),o=b.style.display==='none';b.style.display=o?'block':'none';c.style.transform=o?'rotate(90deg)':'';};
 window.delFood=(ds,rid,i)=>{if(!state.repas[ds]||!state.repas[ds][rid])return;state.repas[ds][rid].splice(i,1);fbSave();refreshNut();};
 
-window.openFoodModal=(ds,rid)=>{cmt={ds,rid};pendFood=null;$('foodModal').classList.add('open');setFoodTab('search');$('searchInput').value='';$('searchResults').innerHTML='';$('qtyPanel').style.display='none';};
+window.openFoodModal=(ds,rid,tab='search')=>{cmt={ds,rid};pendFood=null;$('foodModal').classList.add('open');setFoodTab(tab);if(tab==='search'){$('searchInput').value='';$('searchResults').innerHTML='';}$('qtyPanel').style.display='none';};
+window.openFoodModalFor=tab=>{const ds=todayStr(nutDate);const h=new Date().getHours();let rid='snacks';if(h<11)rid='petit-dej';else if(h<15)rid='dejeuner';else if(h<21)rid='diner';openFoodModal(ds,rid,tab);};
 window.setFoodTab=tab=>{['search','scan','photo'].forEach(t=>{const T=t.charAt(0).toUpperCase()+t.slice(1);$('tab'+T+'Btn').classList.toggle('active',t===tab);$('tab'+T+'Panel').style.display=t===tab?'block':'none';});if(tab!=='scan')stopScanner();if(tab==='scan')startScanner();$('qtyPanel').style.display='none';};
 
 window.debounceSearch=()=>{clearTimeout(sbDebounce);sbDebounce=setTimeout(doSearch,480);};
