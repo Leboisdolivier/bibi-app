@@ -352,7 +352,10 @@ select.form-input option{background:var(--gris);}
     <div id="exerciseList"><div style="text-align:center;padding:26px;color:rgba(255,255,255,0.18);font-size:13px">Lance une séance pour commencer.</div></div>
   </div>
   <div class="sport-content" id="sport-prog"><div id="progContent"></div></div>
-  <div class="sport-content" id="sport-histo"><div id="histoContent"></div></div>
+  <div class="sport-content" id="sport-histo">
+    <button type="button" class="btn-secondary" style="width:100%;margin-bottom:9px;padding:10px;font-size:12px;letter-spacing:0.5px" onclick="openPastWorkoutModal()">📅 SAISIR UNE SÉANCE PASSÉE</button>
+    <div id="histoContent"></div>
+  </div>
 </div>
 
 <!-- BODY -->
@@ -502,7 +505,34 @@ select.form-input option{background:var(--gris);}
     <div class="form-group"><label class="form-lbl">Nom de la séance</label><input type="text" class="form-input" id="workoutName" placeholder="Push Day, Jambes..."></div>
     <div class="form-group"><label class="form-lbl">Exercices</label><div class="exercise-picker" id="exercisePicker"></div></div>
     <div id="selExBadges" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:9px"></div>
-    <button class="btn-primary" style="margin-top:13px" onclick="startWorkout()">🚀 DÉMARRER</button>
+    <div class="form-group" style="margin-top:11px">
+      <label class="form-lbl">Ton exercice perso</label>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        <input type="text" class="form-input" id="customExNom" placeholder="Nom" style="flex:1;min-width:110px">
+        <input type="text" class="form-input" id="customExMuscle" placeholder="Muscle" style="width:90px">
+        <input type="text" class="form-input" id="customExEmoji" placeholder="💪" style="width:44px;text-align:center" maxlength="4">
+        <button type="button" class="btn-secondary" style="padding:10px 10px;font-size:11px;letter-spacing:0.5px" onclick="addCustomExerciseFromModal()">+ AJOUTER</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Modèles de séance</label>
+      <div id="workoutTemplatesRow" style="margin-bottom:7px"></div>
+      <button type="button" class="btn-secondary" style="padding:9px;font-size:12px;letter-spacing:0.5px;width:100%" onclick="saveWorkoutTemplate()">💾 ENREGISTRER COMME MODÈLE</button>
+    </div>
+    <button type="button" class="btn-primary" style="margin-top:13px" onclick="startWorkout()">🚀 DÉMARRER</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pastWorkoutModal">
+  <div class="modal">
+    <div class="modal-title">Séance passée <button type="button" class="modal-close" onclick="closeModal('pastWorkoutModal')">✕</button></div>
+    <div class="form-group"><label class="form-lbl">Date</label><input type="date" class="form-input" id="pastWDate"></div>
+    <div class="form-group"><label class="form-lbl">Nom de la séance</label><input type="text" class="form-input" id="pastWName" placeholder="Push, Jambes..."></div>
+    <div class="form-group"><label class="form-lbl">Durée (minutes)</label><input type="number" class="form-input" id="pastWDurMin" placeholder="Optionnel" min="0" step="1"></div>
+    <div class="form-group"><label class="form-lbl">Exercices</label><div class="exercise-picker" id="pastExercisePicker"></div></div>
+    <div id="pastSelBadges" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:9px"></div>
+    <div id="pastExDetails"></div>
+    <button type="button" class="btn-primary" style="margin-top:13px" onclick="savePastWorkout()">✅ ENREGISTRER DANS L'HISTORIQUE</button>
   </div>
 </div>
 
@@ -545,8 +575,8 @@ const EX_DB=[
   {id:'mollets',nom:'Mollets',emoji:'🦶',muscle:'Mollets'},
 ];
 
-let cu=null,state={profil:{nom:'',age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:''};
-let nutDate=new Date(),cmt=null,pendFood=null,cwData=null,wtStart=null,wtInt=null,selEx=[],scanActive=false,codeRdr=null,chartP=null,chartT=null,chartM=null,poidsRange=7,sbDebounce=null,allProf=[],lastSearchResults=[];
+let cu=null,state={profil:{nom:'',age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:'',customExercises:[],workoutTemplates:[]};
+let nutDate=new Date(),cmt=null,pendFood=null,cwData=null,wtStart=null,wtInt=null,selEx=[],pastSelEx=[],scanActive=false,codeRdr=null,chartP=null,chartT=null,chartM=null,poidsRange=7,sbDebounce=null,allProf=[],lastSearchResults=[];
 
 const $=id=>document.getElementById(id);
 const ANTHROPIC_KEY_STORAGE='bibis_anthropic_key';
@@ -559,17 +589,18 @@ function closeModal(id){const el=$(id);if(el)el.classList.remove('open');stopSca
 window.closeModal=closeModal;
 function showSync(s){const el=$('syncInd');el.textContent=s==='saving'?'● sync...':'● ok';el.className='sync-ind show '+(s==='saving'?'saving':'');if(s==='ok')setTimeout(()=>el.classList.remove('show'),1800);}
 
-async function fbLoad(){if(!fbOK||!cu)return false;try{const sn=await db.collection('bibis_users').doc(cu.pseudo).get();if(sn.exists){state={...state,...sn.data()};return true;}}catch(e){}return false;}
+function normalizeState(){if(!Array.isArray(state.customExercises))state.customExercises=[];if(!Array.isArray(state.workoutTemplates))state.workoutTemplates=[];}
+async function fbLoad(){if(!fbOK||!cu)return false;try{const sn=await db.collection('bibis_users').doc(cu.pseudo).get();if(sn.exists){state={...state,...sn.data()};normalizeState();return true;}}catch(e){}return false;}
 async function fbSave(){if(!fbOK||!cu){lSave();return;}showSync('saving');try{await db.collection('bibis_users').doc(cu.pseudo).set({...state,lastSeen:todayStr(),avatar:cu.avatar},{merge:true});showSync('ok');}catch(e){lSave();}}
 async function fbLoadProfs(){if(!fbOK)return;try{const snaps=await db.collection('bibis_users').get();allProf=[];snaps.docs.forEach(d=>{const data=d.data();allProf.push({pseudo:d.id,avatar:data.avatar||'💪'});});}catch(e){}}
 function lSave(){localStorage.setItem('bibis_'+cu?.pseudo,JSON.stringify(state));}
-function lLoad(){const s=localStorage.getItem('bibis_'+cu?.pseudo);if(s){state={...state,...JSON.parse(s)};return true;}return false;}
+function lLoad(){const s=localStorage.getItem('bibis_'+cu?.pseudo);if(s){state={...state,...JSON.parse(s)};normalizeState();return true;}return false;}
 
 async function showLogin(){$('loginScreen').style.display='flex';$('appContainer').style.display='none';await fbLoadProfs();if(allProf.length){$('existingProfiles').style.display='block';const pl=$('profilesList');pl.innerHTML=allProf.map(p=>`<div class="profile-item" data-pseudo="${(p.pseudo||'').replace(/"/g,'&quot;')}" data-avatar="${(p.avatar||'💪').replace(/"/g,'&quot;')}"><div style="font-size:30px">${p.avatar}</div><div><div style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px">${p.pseudo}</div><div style="font-size:10px;color:rgba(255,255,255,0.35)">Appuie pour te connecter</div></div><span style="color:rgba(255,255,255,0.18);font-size:18px">›</span></div>`).join('');pl.querySelectorAll('.profile-item').forEach(el=>{el.addEventListener('click',()=>{const a=el.dataset.avatar||'💪';loginAs(el.dataset.pseudo||'',a);});});}else{$('existingProfiles').style.display='none';}}
 async function doLogin(){try{const pseudo=($('loginPseudo')?.value||'').trim();if(!pseudo){toast('Saisis ton pseudo !');return;}await loginAs(pseudo,'💪',true);}catch(err){console.error(err);toast('Erreur : '+err.message);}}
 window.doLogin=doLogin;
-window.loginAs=async(pseudo,avatar,isNew=false)=>{try{cu={pseudo,avatar};localStorage.setItem('bibis_current',JSON.stringify({pseudo:pseudo,avatar:avatar}));$('hdrAvatar').textContent=avatar;$('hdrUsername').textContent=pseudo.toUpperCase();const fbL=await fbLoad();if(!fbL)lLoad();if(isNew){state.avatar=avatar;state.pseudo=pseudo;}loadAnthropicKey();fbSave();$('loginScreen').style.display='none';$('appContainer').style.display='block';refreshAll();}catch(err){console.error(err);toast('Erreur : '+err.message);}};
-window.logout=()=>{fbSave();localStorage.removeItem('bibis_current');cu=null;state={profil:{nom:'',age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:''};showLogin();};
+window.loginAs=async(pseudo,avatar,isNew=false)=>{try{cu={pseudo,avatar};localStorage.setItem('bibis_current',JSON.stringify({pseudo:pseudo,avatar:avatar}));$('hdrAvatar').textContent=avatar;$('hdrUsername').textContent=pseudo.toUpperCase();const fbL=await fbLoad();if(!fbL)lLoad();normalizeState();if(isNew){state.avatar=avatar;state.pseudo=pseudo;}loadAnthropicKey();fbSave();$('loginScreen').style.display='none';$('appContainer').style.display='block';refreshAll();}catch(err){console.error(err);toast('Erreur : '+err.message);}};
+window.logout=()=>{fbSave();localStorage.removeItem('bibis_current');cu=null;state={profil:{nom:'',age:25,poids:80,taille:180,sexe:'H',activite:1.55,objectif:'surplus'},nutrition:{kcalGoal:2300,glucGoal:250,lipGoal:65,protGoal:150},repas:{},water:{},workouts:[],poids:[],mensu:[],anthropicKey:'',customExercises:[],workoutTemplates:[]};showLogin();};
 
 window.showScreen=name=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));var se=$('screen-'+name),nb=$('nav-'+name);if(se)se.classList.add('active');if(nb)nb.classList.add('active');if(name==='nutrition')refreshNut();if(name==='profil')refreshProfil();if(name==='sport')refreshSport();if(name==='body')refreshBody();};
 function refreshAll(){refreshNut();refreshProfil();refreshSport();renderStreak();}
