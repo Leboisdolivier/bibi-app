@@ -1,0 +1,31 @@
+{
+  "name": "BIBIS — L'Application",
+  "short_name": "BIBIS",
+  "description": "Nutrition & Entraînement — L'application fitness tout-en-un",
+  "start_url": "/bibi-app/",
+  "scope": "/bibi-app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0c0a",
+  "theme_color": "#0d0c0a",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "fitness",
+    "health",
+    "food"
+  ],
+  "lang": "fr"
+}
