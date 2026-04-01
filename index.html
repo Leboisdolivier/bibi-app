@@ -391,6 +391,42 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
 .sopt-name{font-weight:600;font-size:15px}
 .sopt-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--muted);margin-top:2px}
 
+
+/* ── EXPLORE CHIPS ── */
+.chip{flex-shrink:0;padding:8px 16px;border-radius:100px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;background:var(--s2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip.on{background:var(--gold);color:#000;border-color:var(--gold)}
+.chip:active{transform:scale(.95)}
+
+/* ── EXPLORE CARDS ── */
+.exp-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .15s;margin-bottom:0}
+.exp-card:active{transform:scale(.98);background:var(--s2)}
+.exp-card-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative}
+.exp-card-thumb.rec{background:linear-gradient(135deg,#1a2e1e,#0d1a10)}
+.exp-card-thumb.exo{background:linear-gradient(135deg,#2e1a10,#180d06)}
+.exp-card-thumb.custom{background:linear-gradient(135deg,#1a1a2e,#0d0d1a)}
+.exp-card-body{padding:13px 14px}
+.exp-card-title{font-size:14px;font-weight:600}
+.exp-card-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--muted);letter-spacing:.04em;margin-top:3px}
+.exp-card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.exp-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;padding:2px 8px;border-radius:100px;font-weight:600}
+.exp-tag.gold{background:var(--gold-dim);color:var(--gold)}
+.exp-tag.red{background:var(--red-dim);color:var(--red)}
+.exp-tag.blue{background:var(--blue-dim);color:var(--blue)}
+.exp-tag.green{background:var(--green-dim);color:var(--green)}
+
+/* ── EXPLORE GRID 2 COL ── */
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── RECETTE STEPS ── */
+.recipe-step{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.recipe-step:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--gold-dim);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:16px;flex-shrink:0}
+.step-txt{font-size:13px;line-height:1.6;color:var(--warm)}
+
+/* ── CREATE EXERCICE BUTTON in session ── */
+.create-exo-btn{margin:0 16px 12px;padding:14px;background:var(--s2);border:1px dashed var(--border3);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .15s;font-family:'Barlow Condensed';font-size:14px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+.create-exo-btn:active{background:var(--s3);color:var(--cream)}
+
 /* TOAST / BADGE */
 .toast{position:absolute;top:60px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--s3);border:1px solid var(--border2);border-radius:100px;padding:10px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.06em;white-space:nowrap;z-index:600;opacity:0;transition:all .3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -496,7 +532,7 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
     </div>
     <div class="quick-actions">
       <div class="qa-btn scan" onclick="openScanner()">📷 Scanner code-barres</div>
-      <div class="qa-btn" onclick="showToast('🤖 Photo IA — bientôt')">🤖 Photo IA</div>
+      <div class="qa-btn" onclick="openPhotoIA()">🤖 Photo IA</div>
     </div>
     <div id="recent-section">
       <div class="sec-label">Récents & Favoris</div>
@@ -549,6 +585,57 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
       <div class="micro-table" id="micro-table"></div>
     </div>
     <div class="add-confirm-btn" onclick="confirmAdd()"><span>✓</span><span id="confirm-lbl">Ajouter — 0 kcal</span></div>
+  </div>
+
+  
+  <!-- ══ PHOTO IA OVERLAY ══ -->
+  <div class="scanner-overlay" id="v-photo-ia" style="background:var(--bg)">
+    <div class="scanner-hdr" style="background:linear-gradient(to bottom,rgba(13,12,10,.95),transparent)">
+      <div class="back-btn" style="background:rgba(0,0,0,.5);border-color:rgba(255,255,255,.15)" onclick="closePhotoIA()">←</div>
+      <div style="font-family:'Bebas Neue';font-size:24px;letter-spacing:1px;color:white;flex:1">Photo IA</div>
+      <div style="font-family:'Barlow Condensed';font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.08em">Claude Vision</div>
+    </div>
+
+    <!-- Viewfinder caméra -->
+    <div class="scanner-video-wrap" id="photo-video-wrap" style="position:relative">
+      <video id="photo-video" playsinline autoplay muted style="width:100%;height:100%;object-fit:cover"></video>
+      <canvas id="photo-canvas" style="display:none"></canvas>
+      <!-- Preview photo prise -->
+      <img id="photo-preview" style="display:none;width:100%;height:100%;object-fit:cover">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:20px;pointer-events:none">
+        <div style="font-family:'Barlow Condensed';font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);text-align:center;margin-bottom:8px" id="photo-hint">Cadre ton assiette</div>
+      </div>
+    </div>
+
+    <!-- Contrôles bas -->
+    <div class="scanner-bottom" style="padding:16px 20px 40px">
+      <!-- Permissions -->
+      <div class="cam-perms-msg" id="photo-perms">
+        <div class="cam-perms-icon">📸</div>
+        <div class="cam-perms-txt">BIBIS a besoin de ta caméra pour analyser tes repas avec l'IA</div>
+        <div class="cam-btn" onclick="startPhotoCamera()">Autoriser la caméra</div>
+      </div>
+
+      <!-- Bouton capture -->
+      <div id="photo-capture-row" style="display:none;flex-direction:column;gap:12px;align-items:center">
+        <div onclick="takePhoto()" style="width:68px;height:68px;border-radius:50%;background:white;border:4px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;transition:all .15s;box-shadow:0 4px 20px rgba(0,0,0,.5)" onmousedown="this.style.transform='scale(.92)'" onmouseup="this.style.transform='scale(1)'">📸</div>
+        <div style="font-family:'Barlow Condensed';font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase">Appuyer pour photographier</div>
+      </div>
+
+      <!-- Status analyse -->
+      <div id="photo-status" style="font-family:'Barlow Condensed';font-size:13px;letter-spacing:.06em;color:var(--muted);text-align:center;min-height:18px"></div>
+
+      <!-- Résultats détectés -->
+      <div id="photo-results" style="display:none;flex-direction:column;gap:8px">
+        <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px" id="photo-results-label">Aliments détectés</div>
+        <div id="photo-items-list" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <div onclick="retakePhoto()" style="flex:1;padding:12px;background:var(--s3);border-radius:12px;text-align:center;font-family:'Barlow Condensed';font-size:14px;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:all .15s">↺ Reprendre</div>
+          <div onclick="confirmPhotoAdd()" style="flex:2;padding:12px;background:var(--gold);color:#000;border-radius:12px;text-align:center;font-family:'Bebas Neue';font-size:18px;letter-spacing:1px;cursor:pointer;transition:all .15s;box-shadow:0 4px 16px var(--gold-glow)">✓ Ajouter au journal</div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- ══ SCANNER ══ -->
@@ -670,7 +757,103 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
   </div>
 
   <!-- PLACEHOLDERS -->
-  <div class="view" id="v-explore"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:40px;text-align:center;color:var(--dim)"><div style="font-size:48px;margin-bottom:8px">🔍</div><div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;color:var(--muted)">Explorer</div><div style="font-family:'Barlow Condensed';font-size:13px;letter-spacing:.04em;line-height:1.6">Recettes & exercices<br>→ Prochaine itération</div></div></div>
+  <div class="view" id="v-explore">
+    <div class="screen-top" style="padding-bottom:12px">
+      <div class="screen-title">Explorer</div>
+    </div>
+
+    <!-- Search bar -->
+    <div style="margin:0 16px 14px;background:var(--s2);border:1px solid var(--border3);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px;transition:border-color .2s" id="explore-search-box">
+      <span style="font-size:16px;color:var(--muted)">🔍</span>
+      <input type="text" id="explore-search" placeholder="Recette, exercice, muscle…" oninput="onExploreSearch(this.value)"
+        style="flex:1;background:none;border:none;outline:none;color:var(--cream);font-family:'Barlow',sans-serif;font-size:14px">
+      <span id="explore-search-clear" style="font-size:14px;color:var(--muted);cursor:pointer;display:none" onclick="clearExploreSearch()">✕</span>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:7px;padding:0 16px 16px;overflow-x:auto;scrollbar-width:none" id="explore-tabs">
+      <div class="chip on" onclick="setExploreTab(this,'all')">Tout</div>
+      <div class="chip" onclick="setExploreTab(this,'recettes')">🍽 Recettes</div>
+      <div class="chip" onclick="setExploreTab(this,'exercices')">💪 Exercices</div>
+      <div class="chip" onclick="setExploreTab(this,'mes-exercices')">⭐ Mes exercices</div>
+    </div>
+
+    <!-- Content -->
+    <div id="explore-content" style="padding:0 16px;display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- ══ RECETTE DETAIL ══ -->
+  <div class="detail-overlay" id="v-recette">
+    <div class="detail-top">
+      <div class="back-btn" onclick="closeRecette()">←</div>
+      <div class="detail-title" id="recette-title">Recette</div>
+    </div>
+    <div class="detail-body" id="recette-body"></div>
+  </div>
+
+  <!-- ══ EXERCICE DETAIL ══ -->
+  <div class="detail-overlay" id="v-exercice">
+    <div class="detail-top">
+      <div class="back-btn" onclick="closeExercice()">←</div>
+      <div class="detail-title" id="exercice-title">Exercice</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:0 16px 16px;scrollbar-width:none" id="exercice-body"></div>
+    <div class="add-confirm-btn" id="exercice-add-btn" onclick="addExerciceToSession()" style="background:var(--red);box-shadow:0 6px 24px var(--red-glow)">
+      💪 Ajouter à la séance
+    </div>
+  </div>
+
+  <!-- ══ CRÉER EXERCICE CUSTOM ══ -->
+  <div class="detail-overlay" id="v-create-exercice">
+    <div class="detail-top">
+      <div class="back-btn" onclick="closeCreateExercice()">←</div>
+      <div class="detail-title">Nouvel exercice</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:0 16px;scrollbar-width:none">
+      <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--radius);padding:18px;margin-bottom:14px;display:flex;flex-direction:column;gap:14px">
+        <div>
+          <div class="cfg-label" style="margin-bottom:6px">Nom de l'exercice *</div>
+          <input class="cfg-input" id="ce-name" placeholder="Ex: Curl marteau haltères…">
+        </div>
+        <div>
+          <div class="cfg-label" style="margin-bottom:6px">Groupe musculaire *</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px" id="ce-muscles">
+            <div class="punit" onclick="toggleMuscle(this)">Poitrine</div>
+            <div class="punit" onclick="toggleMuscle(this)">Dos</div>
+            <div class="punit" onclick="toggleMuscle(this)">Épaules</div>
+            <div class="punit" onclick="toggleMuscle(this)">Biceps</div>
+            <div class="punit" onclick="toggleMuscle(this)">Triceps</div>
+            <div class="punit" onclick="toggleMuscle(this)">Quadriceps</div>
+            <div class="punit" onclick="toggleMuscle(this)">Ischio-jambiers</div>
+            <div class="punit" onclick="toggleMuscle(this)">Mollets</div>
+            <div class="punit" onclick="toggleMuscle(this)">Abdominaux</div>
+            <div class="punit" onclick="toggleMuscle(this)">Fessiers</div>
+            <div class="punit" onclick="toggleMuscle(this)">Trapèzes</div>
+            <div class="punit" onclick="toggleMuscle(this)">Avant-bras</div>
+          </div>
+        </div>
+        <div>
+          <div class="cfg-label" style="margin-bottom:6px">Matériel</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px" id="ce-equipment">
+            <div class="punit" onclick="toggleEquip(this)">Barre</div>
+            <div class="punit" onclick="toggleEquip(this)">Haltères</div>
+            <div class="punit" onclick="toggleEquip(this)">Câble</div>
+            <div class="punit" onclick="toggleEquip(this)">Machine</div>
+            <div class="punit" onclick="toggleEquip(this)">Poids corps</div>
+            <div class="punit" onclick="toggleEquip(this)">Élastique</div>
+            <div class="punit" onclick="toggleEquip(this)">Autres</div>
+          </div>
+        </div>
+        <div>
+          <div class="cfg-label" style="margin-bottom:6px">Notes / Instructions</div>
+          <textarea class="cfg-input" id="ce-notes" placeholder="Technique, conseils, erreurs à éviter…" rows="3" style="resize:none;line-height:1.5"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="add-confirm-btn" onclick="saveCustomExercice()" style="background:var(--red);box-shadow:0 6px 24px var(--red-glow)">
+      💾 Enregistrer l'exercice
+    </div>
+  </div>
 
   <div class="fab" onclick="openModal()">+</div>
 
@@ -796,6 +979,7 @@ function initFirebase(cfg){
           document.getElementById('config-screen').classList.add('show');
         }
         loadTodayFromFirebase();
+        loadCustomExercices();
         renderGreeting();
       })
       .catch(e=>{ setSyncDot('error'); loadDemoData(); });
@@ -1230,6 +1414,7 @@ function stopTimer(){clearInterval(timerInt);document.getElementById('rest-timer
 
 function openSession(){
   renderSession();
+  addCreateButtonToSession();
   document.getElementById('session').classList.add('open');
   if(!sessionInt){
     sessionInt=setInterval(()=>{
@@ -1370,6 +1555,721 @@ async function callClaude(userMsg){
 
 function autoResize(el){el.style.height='44px';el.style.height=Math.min(80,el.scrollHeight)+'px';}
 
+
+
+/* ═══════════════════════════════════════
+   EXPLORER DATA
+═══════════════════════════════════════ */
+const RECETTES = [
+  {id:'r1', nom:'Bol protéiné post-workout', emoji:'🥘', kcal:487, prot:42, gluc:38, lip:12,
+   tags:['Post-workout','Riche en protéines','Rapide'],
+   temps:'15 min', portions:1,
+   ingredients:['200g riz basmati cuit','180g blanc de poulet grillé','50g edamame','30g avocat','1 c.s sauce soja','1 c.c huile sésame','Graines de sésame'],
+   etapes:['Cuire le riz basmati selon les instructions.','Faire griller le blanc de poulet avec sel, poivre et un peu d'ail.','Couper le poulet en lanières.','Disposer riz, poulet, edamame et avocat dans un bol.','Arroser de sauce soja et huile de sésame. Parsemer de graines de sésame.']},
+  {id:'r2', nom:'Pancakes protéinés', emoji:'🥞', kcal:380, prot:32, gluc:42, lip:8,
+   tags:['Petit-déjeuner','Protéines','Sweet'],
+   temps:'10 min', portions:2,
+   ingredients:['80g flocons d'avoine mixés','30g whey vanille','2 œufs','100ml lait d'amande','1/2 banane écrasée','1 c.c levure chimique'],
+   etapes:['Mixer les flocons d'avoine en farine.','Mélanger tous les ingrédients jusqu'à obtenir une pâte lisse.','Chauffer une poêle antiadhésive à feu moyen.','Cuire les pancakes 2-3 min de chaque côté.','Servir avec fruits rouges ou sirop d'érable light.']},
+  {id:'r3', nom:'Salade niçoise légère', emoji:'🥗', kcal:320, prot:28, gluc:18, lip:14,
+   tags:['Déjeuner','Léger','Méditerranéen'],
+   temps:'10 min', portions:1,
+   ingredients:['130g thon boîte (eau)','2 œufs durs','150g haricots verts cuits','1 tomate','1/2 concombre','Olives noires','Vinaigrette légère'],
+   etapes:['Cuire les haricots verts à la vapeur 8 min.','Faire durcir les œufs 10 min, peler et couper.','Égoutter et émietter le thon.','Couper tomate et concombre en dés.','Dresser tous les ingrédients, assaisonner.']},
+  {id:'r4', nom:'Poulet teriyaki & riz', emoji:'🍗', kcal:520, prot:38, gluc:58, lip:10,
+   tags:['Dîner','Prise de masse','Asiatique'],
+   temps:'25 min', portions:1,
+   ingredients:['200g blanc de poulet','200g riz blanc cuit','2 c.s sauce soja','1 c.s miel','1 c.c gingembre râpé','1 gousse d'ail','Brocoli vapeur'],
+   etapes:['Mélanger sauce soja, miel, gingembre et ail pour la marinade.','Faire mariner le poulet 15 min minimum.','Cuire le poulet à la poêle 6-7 min de chaque côté.','Laquer avec la marinade en fin de cuisson.','Servir sur riz avec brocoli vapeur.']},
+  {id:'r5', nom:'Smoothie prise de masse', emoji:'🥤', kcal:650, prot:45, gluc:80, lip:14,
+   tags:['Prise de masse','Petit-déjeuner','Rapide'],
+   temps:'5 min', portions:1,
+   ingredients:['300ml lait entier','1 banane congelée','30g whey chocolat','50g flocons d'avoine','1 c.s beurre de cacahuète','1 c.c miel'],
+   etapes:['Mettre tous les ingrédients dans un blender.','Mixer 60 secondes jusqu'à consistance lisse.','Ajuster la texture avec un peu de lait si trop épais.','Consommer immédiatement après l'entraînement.']},
+  {id:'r6', nom:'Omelette aux légumes', emoji:'🍳', kcal:285, prot:24, gluc:8, lip:17,
+   tags:['Petit-déjeuner','Low carb','Rapide'],
+   temps:'10 min', portions:1,
+   ingredients:['3 œufs','50g épinards','30g champignons','20g fromage râpé','Sel, poivre, herbes'],
+   etapes:['Battre les œufs avec sel et poivre.','Faire revenir les légumes 3 min à la poêle.','Verser les œufs sur les légumes.','Ajouter le fromage, plier l'omelette.','Servir immédiatement.']},
+];
+
+const EXERCISES_DB = [
+  // POITRINE
+  {id:'e1', nom:'Développé couché barre', muscle:'Poitrine', secondaire:'Épaules · Triceps', emoji:'🏋️', materiel:'Barre', difficulte:'Intermédiaire',
+   description:'Exercice fondamental pour développer la masse pectorale. Allongé sur le banc, barre à largeur d'épaules. Descendre la barre jusqu'à la poitrine, pousser en contractant les pectoraux.',
+   conseils:['Garder les pieds à plat au sol','Ne pas rebondir la barre sur la poitrine','Contrôler la descente sur 2-3 sec','Serrer les omoplates avant de saisir la barre'],
+   tags:['Compound','Force','Masse']},
+  {id:'e2', nom:'Développé couché haltères', muscle:'Poitrine', secondaire:'Épaules · Triceps', emoji:'🏋️', materiel:'Haltères', difficulte:'Débutant',
+   description:'Variante haltères permettant une plus grande amplitude de mouvement. Idéal pour corriger les déséquilibres gauche/droite.',
+   conseils:['Poignets neutres pendant le mouvement','Aller jusqu'à sentir un étirement pectoral','Rotation naturelle des poignets en montant'],
+   tags:['Compound','Amplitude','Symétrie']},
+  {id:'e3', nom:'Écarté câble poulie haute', muscle:'Poitrine', secondaire:'Épaules antérieures', emoji:'🔄', materiel:'Câble', difficulte:'Débutant',
+   description:'Isolation des pectoraux en contraction. Maintenir une tension constante tout au long du mouvement.',
+   conseils:['Légère flexion des coudes (ne pas verrouiller)','Expirer en croisant les mains','Visualiser serrer une orange contre la poitrine'],
+   tags:['Isolation','Définition','Finition']},
+  {id:'e4', nom:'Pompes lestées', muscle:'Poitrine', secondaire:'Triceps · Abdos', emoji:'💪', materiel:'Poids corps', difficulte:'Intermédiaire',
+   description:'Pompe classique avec gilet lesté ou disque dans le dos. Excellent pour la force fonctionnelle.',
+   conseils:['Corps en planche parfaite','Poitrine touche quasiment le sol','Écarter légèrement les coudes'],
+   tags:['Compound','Fonctionnel','Sans machine']},
+  // DOS
+  {id:'e5', nom:'Traction pronation', muscle:'Dos', secondaire:'Biceps · Arrière épaules', emoji:'🔄', materiel:'Barre', difficulte:'Intermédiaire',
+   description:'Roi des exercices de dos. Prise en pronation, largeur d'épaules. Tirer avec les coudes, pas avec les bras.',
+   conseils:['Rétraction scapulaire avant de tirer','Menton au-dessus de la barre','Phase excentrique lente'],
+   tags:['Compound','Force','Masse']},
+  {id:'e6', nom:'Rowing barre', muscle:'Dos', secondaire:'Biceps · Trapèzes', emoji:'🏋️', materiel:'Barre', difficulte:'Intermédiaire',
+   description:'Mouvement de tirage horizontal lourd. Penché à 45°, tirer la barre vers le nombril en serrant les omoplates.',
+   conseils:['Dos plat, jamais arrondi','Ne pas utiliser l'élan du dos','Serrer les omoplates en fin de mouvement'],
+   tags:['Compound','Épaisseur','Force']},
+  {id:'e7', nom:'Soulevé de terre', muscle:'Dos', secondaire:'Jambes · Fessiers · Trapèzes', emoji:'🏋️', materiel:'Barre', difficulte:'Avancé',
+   description:'Exercice roi en force athlétique. Chaîne postérieure complète. Technique irréprochable obligatoire.',
+   conseils:['Barre proche du corps tout au long du mouvement','Bloquer abdos et respiration','Hanches et épaules montent ensemble'],
+   tags:['Compound','Force','Full body']},
+  // JAMBES
+  {id:'e8', nom:'Squat barre', muscle:'Quadriceps', secondaire:'Fessiers · Ischio · Lombaires', emoji:'🦵', materiel:'Barre', difficulte:'Intermédiaire',
+   description:'Exercice roi des jambes. Barre sur les trapèzes, descente jusqu'à parallèle minimum, genou dans l'axe des orteils.',
+   conseils:['Pieds largeur d'épaules, orteils légèrement sortis','Genoux ne dépassent pas les orteils de trop','Regard droit devant','Descendre jusqu'à parallèle minimum'],
+   tags:['Compound','Force','Masse']},
+  {id:'e9', nom:'Presse à cuisses', muscle:'Quadriceps', secondaire:'Fessiers · Ischio', emoji:'🦵', materiel:'Machine', difficulte:'Débutant',
+   description:'Alternative sécurisée au squat pour développer le volume des quadriceps. Idéal pour les débutants ou en fin de séance.',
+   conseils:['Pieds à mi-hauteur de la plateforme','Ne pas verrouiller les genoux en haut','Amplitude complète recommandée'],
+   tags:['Compound','Volume','Sécurité']},
+  {id:'e10', nom:'Fentes haltères', muscle:'Quadriceps', secondaire:'Fessiers · Mollets', emoji:'🦵', materiel:'Haltères', difficulte:'Débutant',
+   description:'Excellent exercice unilatéral pour corriger les déséquilibres et travailler la stabilité.',
+   conseils:['Grand pas en avant','Genou arrière frôle le sol','Tronc droit pendant tout le mouvement'],
+   tags:['Unilatéral','Équilibre','Fonctionnel']},
+  // ÉPAULES
+  {id:'e11', nom:'Développé militaire barre', muscle:'Épaules', secondaire:'Triceps · Trapèzes', emoji:'🏋️', materiel:'Barre', difficulte:'Intermédiaire',
+   description:'Exercice de force pour les épaules. Debout ou assis, pousser la barre au-dessus de la tête en gainage strict.',
+   conseils:['Contracter les fessiers et abdos','Pas de cambrure lombaire excessive','Barre passe devant le visage'],
+   tags:['Compound','Force','Masse']},
+  {id:'e12', nom:'Élévations latérales', muscle:'Épaules', secondaire:'Trapèzes', emoji:'💪', materiel:'Haltères', difficulte:'Débutant',
+   description:'Isolation du faisceau latéral deltoïde pour développer la largeur des épaules.',
+   conseils:['Légère flexion des coudes','Monter jusqu'à l'horizontale maximum','Contrôler la descente','Pas d'élan du corps'],
+   tags:['Isolation','Largeur','Définition']},
+  // BRAS
+  {id:'e13', nom:'Curl barre EZ', muscle:'Biceps', secondaire:'Avant-bras', emoji:'💪', materiel:'Barre', difficulte:'Débutant',
+   description:'Mouvement de base pour le volume des biceps. Prise en supination, coudes fixes contre le corps.',
+   conseils:['Coudes collés au corps','Amplitude complète','Contraction maximale en haut'],
+   tags:['Isolation','Volume','Masse']},
+  {id:'e14', nom:'Extension triceps câble', muscle:'Triceps', secondaire:'', emoji:'🔄', materiel:'Câble', difficulte:'Débutant',
+   description:'Isolation des triceps en tension constante. Coudes fixes, extension complète.',
+   conseils:['Coudes pointés vers le bas et fixes','Verrouiller les triceps en bas','Contraction maximale'],
+   tags:['Isolation','Définition','Tension']},
+  // ABDOS
+  {id:'e15', nom:'Planche abdominale', muscle:'Abdominaux', secondaire:'Lombaires · Épaules', emoji:'🧘', materiel:'Poids corps', difficulte:'Débutant',
+   description:'Gainage isométrique fondamental. Corps parfaitement aligné, maintenir la position.',
+   conseils:['Bassin ni trop haut ni trop bas','Contracter abdos ET fessiers','Respirer normalement'],
+   tags:['Gainage','Isométrique','Fonctionnel']},
+  {id:'e16', nom:'Crunch à la poulie', muscle:'Abdominaux', secondaire:'', emoji:'🔄', materiel:'Câble', difficulte:'Débutant',
+   description:'Crunch avec résistance constante. Meilleur que le crunch classique pour la progression.',
+   conseils:['Enrouler la colonne vertébrale','Ne pas tirer avec les bras','Expirer en contractant'],
+   tags:['Isolation','Résistance','Progression']},
+];
+
+// Exercices custom (chargés depuis Firestore)
+let customExercices = [];
+let currentExerciceForDetail = null;
+let currentRecetteForDetail = null;
+let currentExploreTab = 'all';
+let exploreSearchQuery = '';
+
+/* ═══════════════════════════════════════
+   PHOTO IA — Claude Vision
+═══════════════════════════════════════ */
+let photoStream = null;
+let photoDataUrl = null;
+let photoDetectedFoods = [];
+
+function openPhotoIA(){
+  if(!claudeKey){
+    showToast('⚡ Configure ta clé Anthropic pour utiliser Photo IA');
+    showConfig();
+    return;
+  }
+  document.getElementById('v-photo-ia').classList.add('open');
+  document.getElementById('photo-perms').className = 'cam-perms-msg show';
+  document.getElementById('photo-capture-row').style.display = 'none';
+  document.getElementById('photo-results').style.display = 'none';
+  document.getElementById('photo-status').textContent = '';
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-video').style.display = 'block';
+  photoDataUrl = null;
+  photoDetectedFoods = [];
+}
+
+function closePhotoIA(){
+  stopPhotoCamera();
+  document.getElementById('v-photo-ia').classList.remove('open');
+}
+
+function startPhotoCamera(){
+  document.getElementById('photo-perms').classList.remove('show');
+  document.getElementById('photo-status').textContent = 'Initialisation caméra…';
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'environment', width: {ideal:1920}, height: {ideal:1080} }
+  }).then(stream => {
+    photoStream = stream;
+    const video = document.getElementById('photo-video');
+    video.srcObject = stream;
+    video.style.display = 'block';
+    document.getElementById('photo-capture-row').style.display = 'flex';
+    document.getElementById('photo-status').textContent = '';
+    document.getElementById('photo-hint').textContent = 'Cadre ton assiette et appuie sur 📸';
+  }).catch(e => {
+    document.getElementById('photo-status').textContent = '❌ Caméra inaccessible — ' + e.message;
+  });
+}
+
+function stopPhotoCamera(){
+  if(photoStream){ photoStream.getTracks().forEach(t => t.stop()); photoStream = null; }
+}
+
+function takePhoto(){
+  const video = document.getElementById('photo-video');
+  const canvas = document.getElementById('photo-canvas');
+  // Redimensionner à 800px max pour limiter la taille base64
+  const maxW = 800;
+  const ratio = Math.min(maxW / video.videoWidth, maxW / video.videoHeight);
+  canvas.width = Math.round(video.videoWidth * ratio);
+  canvas.height = Math.round(video.videoHeight * ratio);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  photoDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+  // Afficher preview
+  const preview = document.getElementById('photo-preview');
+  preview.src = photoDataUrl;
+  preview.style.display = 'block';
+  video.style.display = 'none';
+  document.getElementById('photo-capture-row').style.display = 'none';
+  document.getElementById('photo-hint').textContent = '';
+
+  stopPhotoCamera();
+  analyzePhotoWithClaude(photoDataUrl);
+}
+
+async function analyzePhotoWithClaude(dataUrl){
+  document.getElementById('photo-status').textContent = '🤖 Claude analyse ton assiette…';
+  document.getElementById('photo-results').style.display = 'none';
+
+  // Extraire le base64 pur (sans le préfixe data:image/jpeg;base64,)
+  const base64 = dataUrl.split(',')[1];
+
+  const prompt = `Tu es un expert en nutrition. Analyse cette photo de repas et identifie tous les aliments visibles.
+Pour chaque aliment détecté, estime la portion en grammes et donne les valeurs nutritionnelles pour cette portion.
+Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, avec ce format exact:
+{
+  "repas_description": "description courte du repas",
+  "aliments": [
+    {
+      "nom": "nom de l'aliment",
+      "portion_g": 150,
+      "kcal": 200,
+      "proteines_g": 15,
+      "glucides_g": 20,
+      "lipides_g": 5
+    }
+  ]
+}
+Sois précis sur les portions. Si tu vois un steak, estime 180g. Si tu vois une poignée de pâtes, estime 200g cuit.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': claudeKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: 'image/jpeg',
+                data: base64
+              }
+            },
+            {
+              type: 'text',
+              text: prompt
+            }
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.content && data.content[0]){
+      const raw = data.content[0].text.trim();
+      // Nettoyer si Claude a quand même ajouté des backticks
+      const clean = raw.replace(/^```json\n?/,'').replace(/^```\n?/,'').replace(/\n?```$/,'').trim();
+      try {
+        const parsed = JSON.parse(clean);
+        displayPhotoResults(parsed);
+      } catch(e){
+        document.getElementById('photo-status').textContent = '⚠️ Réponse IA non parseable — réessaie';
+        console.error('Parse error:', raw);
+      }
+    } else if(data.error){
+      document.getElementById('photo-status').textContent = '❌ ' + data.error.message;
+    }
+  } catch(e){
+    document.getElementById('photo-status').textContent = '❌ Erreur réseau — vérifie ta connexion';
+  }
+}
+
+function displayPhotoResults(parsed){
+  document.getElementById('photo-status').textContent = '';
+  photoDetectedFoods = parsed.aliments || [];
+
+  const label = document.getElementById('photo-results-label');
+  label.textContent = (parsed.repas_description || 'Aliments détectés') +
+    ' — ' + photoDetectedFoods.reduce((s,f)=>s+f.kcal,0) + ' kcal total';
+
+  const list = document.getElementById('photo-items-list');
+  list.innerHTML = photoDetectedFoods.map((f, i) => `
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+      <input type="checkbox" id="photo-chk-${i}" checked style="width:18px;height:18px;accent-color:var(--gold);flex-shrink:0">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${f.nom}</div>
+        <div style="font-family:'Barlow Condensed';font-size:11px;color:var(--muted);letter-spacing:.04em;margin-top:1px">${f.portion_g}g · <span style="color:#f5a623">${f.proteines_g}g prot</span> · ${f.glucides_g}g gluc · ${f.lipides_g}g lip</div>
+      </div>
+      <div style="font-family:'Bebas Neue';font-size:20px;color:var(--gold)">${f.kcal}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('photo-results').style.display = 'flex';
+}
+
+function retakePhoto(){
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-video').style.display = 'block';
+  document.getElementById('photo-results').style.display = 'none';
+  document.getElementById('photo-status').textContent = '';
+  photoDataUrl = null;
+  photoDetectedFoods = [];
+  startPhotoCamera();
+}
+
+function confirmPhotoAdd(){
+  // Ajouter uniquement les aliments cochés
+  let added = 0;
+  photoDetectedFoods.forEach((f, i) => {
+    const chk = document.getElementById('photo-chk-' + i);
+    if(chk && chk.checked){
+      const rawFood = {
+        id: 'photo_' + Date.now() + '_' + i,
+        name: f.nom,
+        brand: 'Photo IA',
+        emoji: '📸',
+        kcal: Math.round(f.kcal / (f.portion_g/100)),
+        prot: +(f.proteines_g / (f.portion_g/100)).toFixed(1),
+        carb: +(f.glucides_g / (f.portion_g/100)).toFixed(1),
+        fat:  +(f.lipides_g  / (f.portion_g/100)).toFixed(1),
+        fiber: 0, sugar: 0, sodium: 0,
+        units: ['g', 'portion (' + f.portion_g + 'g)'],
+      };
+      journal[currentMealTarget].push({
+        foodId: rawFood.id,
+        qty: f.portion_g,
+        unit: 'g',
+        __raw: rawFood
+      });
+      added++;
+    }
+  });
+
+  if(added > 0){
+    renderJournal();
+    debouncedSave();
+    showToast('📸 ' + added + ' aliment' + (added>1?'s':'') + ' ajouté' + (added>1?'s':'') + ' au journal');
+    closePhotoIA();
+    goJournal();
+  } else {
+    showToast('⚠️ Sélectionne au moins un aliment');
+  }
+}
+
+
+/* ═══════════════════════════════════════
+   EXPLORER
+═══════════════════════════════════════ */
+
+function setExploreTab(el, tab){
+  document.querySelectorAll('#explore-tabs .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  currentExploreTab = tab;
+  renderExplorer();
+}
+
+function onExploreSearch(val){
+  exploreSearchQuery = val.toLowerCase();
+  document.getElementById('explore-search-clear').style.display = val ? 'block' : 'none';
+  renderExplorer();
+}
+
+function clearExploreSearch(){
+  document.getElementById('explore-search').value = '';
+  onExploreSearch('');
+}
+
+function renderExplorer(){
+  const container = document.getElementById('explore-content');
+  container.innerHTML = '';
+  const q = exploreSearchQuery;
+
+  // ── RECETTES ──
+  if(currentExploreTab === 'all' || currentExploreTab === 'recettes'){
+    const recs = q
+      ? RECETTES.filter(r => r.nom.toLowerCase().includes(q) || r.tags.some(t=>t.toLowerCase().includes(q)))
+      : RECETTES;
+
+    if(recs.length){
+      const label = document.createElement('div');
+      label.className = 'sec-label';
+      label.style.padding = '4px 0 10px';
+      label.textContent = currentExploreTab==='all' ? '🍽 Recettes' : recs.length+' recette'+(recs.length>1?'s':'');
+      container.appendChild(label);
+
+      const grid = document.createElement('div');
+      grid.className = 'exp-grid';
+      recs.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'exp-card';
+        div.innerHTML = `
+          <div class="exp-card-thumb rec">${r.emoji}</div>
+          <div class="exp-card-body">
+            <div class="exp-card-title">${r.nom}</div>
+            <div class="exp-card-sub">⏱ ${r.temps} · ${r.prot}g prot · ${r.kcal} kcal</div>
+            <div class="exp-card-tags">
+              ${r.tags.map(t=>`<span class="exp-tag gold">${t}</span>`).join('')}
+            </div>
+          </div>`;
+        div.onclick = () => openRecette(r);
+        grid.appendChild(div);
+      });
+      container.appendChild(grid);
+    }
+  }
+
+  // ── EXERCICES DB ──
+  if(currentExploreTab === 'all' || currentExploreTab === 'exercices'){
+    const exos = q
+      ? EXERCISES_DB.filter(e => e.nom.toLowerCase().includes(q) || e.muscle.toLowerCase().includes(q) || (e.secondaire||'').toLowerCase().includes(q))
+      : EXERCISES_DB;
+
+    if(exos.length){
+      const label = document.createElement('div');
+      label.className = 'sec-label';
+      label.style.cssText = 'padding:16px 0 10px';
+      label.textContent = currentExploreTab==='all' ? '💪 Exercices' : exos.length+' exercice'+(exos.length>1?'s':'');
+      container.appendChild(label);
+
+      // Grouper par muscle si onglet exercices
+      if(currentExploreTab === 'exercices' && !q){
+        const groups = {};
+        exos.forEach(e => { if(!groups[e.muscle]) groups[e.muscle]=[];  groups[e.muscle].push(e); });
+        Object.entries(groups).forEach(([muscle, list]) => {
+          const mlabel = document.createElement('div');
+          mlabel.style.cssText = 'font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 0 8px;';
+          mlabel.textContent = muscle;
+          container.appendChild(mlabel);
+          const grid = document.createElement('div');
+          grid.className = 'exp-grid';
+          list.forEach(e => { grid.appendChild(buildExoCard(e)); });
+          container.appendChild(grid);
+        });
+      } else {
+        const grid = document.createElement('div');
+        grid.className = 'exp-grid';
+        exos.forEach(e => grid.appendChild(buildExoCard(e)));
+        container.appendChild(grid);
+      }
+    }
+  }
+
+  // ── MES EXERCICES CUSTOM ──
+  if(currentExploreTab === 'all' || currentExploreTab === 'mes-exercices'){
+    const all = [...customExercices].filter(e => !q || e.nom.toLowerCase().includes(q) || (e.muscle||'').toLowerCase().includes(q));
+    const label = document.createElement('div');
+    label.className = 'sec-label';
+    label.style.cssText = 'padding:16px 0 10px;display:flex;align-items:center;justify-content:space-between';
+    label.innerHTML = `<span>⭐ Mes exercices (${all.length})</span>
+      <span onclick="openCreateExercice()" style="font-family:'Barlow Condensed';font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--gold);cursor:pointer;padding:4px 12px;background:var(--gold-dim);border-radius:100px">+ Créer</span>`;
+    container.appendChild(label);
+
+    if(all.length === 0 && currentExploreTab === 'mes-exercices'){
+      const empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center;padding:32px 16px;font-family:Barlow Condensed,sans-serif;font-size:13px;color:var(--dim);letter-spacing:.04em;line-height:1.8';
+      empty.innerHTML = '💪<br>Aucun exercice personnalisé<br>Appuie sur + Créer pour en ajouter';
+      container.appendChild(empty);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'exp-grid';
+      all.forEach(e => grid.appendChild(buildCustomExoCard(e)));
+      container.appendChild(grid);
+    }
+  }
+
+  // Empty state
+  if(q && container.children.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:40px 20px;font-family:Barlow Condensed,sans-serif;font-size:14px;color:var(--dim);letter-spacing:.04em">Aucun résultat pour "'+exploreSearchQuery+'"</div>';
+  }
+}
+
+function buildExoCard(e){
+  const div = document.createElement('div');
+  div.className = 'exp-card';
+  div.innerHTML = `
+    <div class="exp-card-thumb exo">${e.emoji}</div>
+    <div class="exp-card-body">
+      <div class="exp-card-title">${e.nom}</div>
+      <div class="exp-card-sub">${e.muscle}${e.secondaire?' · '+e.secondaire:''}</div>
+      <div class="exp-card-tags">
+        <span class="exp-tag red">${e.materiel}</span>
+        ${e.tags.slice(0,1).map(t=>`<span class="exp-tag gold">${t}</span>`).join('')}
+      </div>
+    </div>`;
+  div.onclick = () => openExercice(e);
+  return div;
+}
+
+function buildCustomExoCard(e){
+  const div = document.createElement('div');
+  div.className = 'exp-card';
+  div.innerHTML = `
+    <div class="exp-card-thumb custom" style="position:relative">
+      <span style="font-size:36px">⭐</span>
+      <span style="position:absolute;top:6px;right:6px;font-size:10px;background:var(--s3);padding:2px 6px;border-radius:100px;font-family:Barlow Condensed;color:var(--muted);letter-spacing:.04em">Custom</span>
+    </div>
+    <div class="exp-card-body">
+      <div class="exp-card-title">${e.nom}</div>
+      <div class="exp-card-sub">${e.muscles||'—'}${e.equipment?' · '+e.equipment:''}</div>
+      <div class="exp-card-tags"><span class="exp-tag blue">Personnel</span></div>
+    </div>`;
+  div.onclick = () => openCustomExercice(e);
+  return div;
+}
+
+// ── RECETTE DETAIL ──────────────────────────────────
+function openRecette(r){
+  currentRecetteForDetail = r;
+  document.getElementById('recette-title').textContent = r.nom;
+  const body = document.getElementById('recette-body');
+  body.innerHTML = `
+    <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:14px">
+      <div style="font-size:48px;text-align:center;margin-bottom:12px">${r.emoji}</div>
+      <div style="font-family:'Bebas Neue';font-size:36px;color:var(--gold);text-align:center;line-height:1">${r.kcal} kcal</div>
+      <div style="font-family:'Barlow Condensed';font-size:12px;color:var(--muted);text-align:center;letter-spacing:.06em;margin-top:4px">pour ${r.portions} portion${r.portions>1?'s':''} · ${r.temps}</div>
+      <div style="display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="flex:1;text-align:center;background:var(--s2);border-radius:10px;padding:10px 6px">
+          <div style="font-family:'Bebas Neue';font-size:22px;color:#f5a623">${r.prot}g</div>
+          <div style="font-family:'Barlow Condensed';font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase">Prot.</div>
+        </div>
+        <div style="flex:1;text-align:center;background:var(--s2);border-radius:10px;padding:10px 6px">
+          <div style="font-family:'Bebas Neue';font-size:22px;color:#5bb8f5">${r.gluc}g</div>
+          <div style="font-family:'Barlow Condensed';font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase">Gluc.</div>
+        </div>
+        <div style="flex:1;text-align:center;background:var(--s2);border-radius:10px;padding:10px 6px">
+          <div style="font-family:'Bebas Neue';font-size:22px;color:var(--gold)">${r.lip}g</div>
+          <div style="font-family:'Barlow Condensed';font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase">Lip.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Ingrédients</div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px">
+      ${r.ingredients.map(i=>`<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--warm);display:flex;align-items:center;gap:8px"><span style="color:var(--gold)">·</span>${i}</div>`).join('')}
+    </div>
+
+    <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Préparation</div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px">
+      ${r.etapes.map((s,i)=>`<div class="recipe-step"><div class="step-num">${i+1}</div><div class="step-txt">${s}</div></div>`).join('')}
+    </div>
+
+    <div onclick="addRecetteToJournal()" style="display:flex;align-items:center;justify-content:center;gap:10px;background:var(--gold);color:#000;font-family:'Bebas Neue';font-size:22px;letter-spacing:1px;padding:16px;border-radius:14px;cursor:pointer;transition:all .18s;box-shadow:0 6px 24px var(--gold-glow);margin-bottom:16px">
+      🍽 Ajouter au journal (${r.kcal} kcal)
+    </div>
+  `;
+  document.getElementById('v-recette').classList.add('open');
+}
+
+function closeRecette(){ document.getElementById('v-recette').classList.remove('open'); }
+
+function addRecetteToJournal(){
+  if(!currentRecetteForDetail) return;
+  const r = currentRecetteForDetail;
+  const rawFood = {
+    id:'rec_'+r.id, name:r.nom, brand:'Recette BIBIS', emoji:r.emoji,
+    kcal:r.kcal, prot:r.prot, carb:r.gluc, fat:r.lip, fiber:2, sugar:0, sodium:0,
+    units:['portion (1)'],
+  };
+  journal[currentMealTarget].push({foodId:rawFood.id, qty:1, unit:'portion (1)', __raw:rawFood});
+  renderJournal();
+  debouncedSave();
+  closeRecette();
+  showToast('🍽 ' + r.nom + ' ajouté — ' + r.kcal + ' kcal');
+  switchTab('nutrition');
+}
+
+// ── EXERCICE DETAIL ─────────────────────────────────
+function openExercice(e){
+  currentExerciceForDetail = e;
+  document.getElementById('exercice-title').textContent = e.nom;
+  const body = document.getElementById('exercice-body');
+  body.innerHTML = `
+    <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:14px">
+      <div style="font-size:48px;text-align:center;margin-bottom:12px">${e.emoji}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">
+        <span class="exp-tag red">${e.muscle}</span>
+        ${e.secondaire?`<span class="exp-tag gold">${e.secondaire}</span>`:''}
+        <span class="exp-tag blue">${e.materiel}</span>
+        <span class="exp-tag green">${e.difficulte}</span>
+      </div>
+      <div style="font-size:14px;line-height:1.6;color:var(--warm)">${e.description}</div>
+    </div>
+
+    <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Conseils techniques</div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px">
+      ${e.conseils.map(c=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--warm);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--gold);flex-shrink:0">✓</span>${c}</div>`).join('')}
+    </div>
+
+    <div style="font-family:'Barlow Condensed';font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Tags</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px">
+      ${e.tags.map(t=>`<span class="exp-tag gold">${t}</span>`).join('')}
+    </div>
+  `;
+  document.getElementById('v-exercice').classList.add('open');
+}
+
+function openCustomExercice(e){
+  currentExerciceForDetail = e;
+  document.getElementById('exercice-title').textContent = e.nom;
+  const body = document.getElementById('exercice-body');
+  body.innerHTML = `
+    <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:14px">
+      <div style="font-size:48px;text-align:center;margin-bottom:12px">⭐</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">
+        <span class="exp-tag blue">${e.muscles||'—'}</span>
+        ${e.equipment?`<span class="exp-tag red">${e.equipment}</span>`:''}
+        <span class="exp-tag green">Custom</span>
+      </div>
+      ${e.notes?`<div style="font-size:14px;line-height:1.6;color:var(--warm)">${e.notes}</div>`:'<div style="font-family:Barlow Condensed;color:var(--dim);text-align:center">Aucune note</div>'}
+    </div>
+    <div onclick="deleteCustomExercice('${e.id}')" style="text-align:center;padding:12px;font-family:Barlow Condensed;font-size:13px;color:var(--red);letter-spacing:.06em;cursor:pointer;margin-bottom:16px">🗑 Supprimer cet exercice</div>
+  `;
+  document.getElementById('v-exercice').classList.add('open');
+}
+
+function closeExercice(){ document.getElementById('v-exercice').classList.remove('open'); currentExerciceForDetail=null; }
+
+function addExerciceToSession(){
+  if(!currentExerciceForDetail) return;
+  const e = currentExerciceForDetail;
+  const nom = e.nom;
+  const muscle = e.muscle || e.muscles || '—';
+  // Ajouter à EXERCISES (séance en cours)
+  EXERCISES.push({
+    id: Date.now(),
+    name: nom,
+    muscle: muscle + (e.secondaire?' · '+e.secondaire:''),
+    sets: [{kg:0,reps:10,done:false},{kg:0,reps:10,done:false},{kg:0,reps:10,done:false}],
+    prevKg:0, prevReps:10, prKg:0
+  });
+  closeExercice();
+  showToast('💪 ' + nom + ' ajouté à la séance');
+  openSession();
+}
+
+// ── EXERCICE CUSTOM ─────────────────────────────────
+function openCreateExercice(){
+  // Reset form
+  document.getElementById('ce-name').value = '';
+  document.getElementById('ce-notes').value = '';
+  document.querySelectorAll('#ce-muscles .punit').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('#ce-equipment .punit').forEach(p=>p.classList.remove('on'));
+  document.getElementById('v-create-exercice').classList.add('open');
+}
+
+function closeCreateExercice(){ document.getElementById('v-create-exercice').classList.remove('open'); }
+
+function toggleMuscle(el){ el.classList.toggle('on'); }
+function toggleEquip(el){
+  document.querySelectorAll('#ce-equipment .punit').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+async function saveCustomExercice(){
+  const nom = document.getElementById('ce-name').value.trim();
+  if(!nom){ showToast('⚠️ Donne un nom à l'exercice'); return; }
+  const muscles = [...document.querySelectorAll('#ce-muscles .punit.on')].map(p=>p.textContent).join(', ');
+  const equipment = [...document.querySelectorAll('#ce-equipment .punit.on')].map(p=>p.textContent).join(', ');
+  const notes = document.getElementById('ce-notes').value.trim();
+
+  const exo = {
+    id: 'custom_' + Date.now(),
+    nom, muscles, equipment, notes,
+    createdAt: new Date().toISOString(),
+    userId,
+  };
+
+  customExercices.push(exo);
+
+  // Sauvegarder dans Firestore
+  if(db){
+    try {
+      await db.collection('custom_exercises').doc(exo.id).set({
+        ...exo, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showToast('💾 ' + nom + ' sauvegardé dans Firebase');
+    } catch(e){
+      showToast('✓ ' + nom + ' sauvegardé localement');
+    }
+  }
+
+  closeCreateExercice();
+  renderExplorer();
+}
+
+async function loadCustomExercices(){
+  if(!db) return;
+  try {
+    const snap = await db.collection('custom_exercises').where('userId','==',userId).get();
+    customExercices = snap.docs.map(d => d.data());
+    renderExplorer();
+  } catch(e){}
+}
+
+async function deleteCustomExercice(id){
+  customExercices = customExercices.filter(e=>e.id!==id);
+  if(db){ try{ await db.collection('custom_exercises').doc(id).delete(); }catch(e){} }
+  closeExercice();
+  showToast('🗑 Exercice supprimé');
+  renderExplorer();
+}
+
+// ── BOUTON CRÉER DANS SESSION ────────────────────────
+function addCreateButtonToSession(){
+  // Ajouter le bouton "+ Créer exercice" à la fin de la séance
+  const container = document.getElementById('exo-cards-container');
+  if(container && !document.getElementById('session-create-btn')){
+    const btn = document.createElement('div');
+    btn.id = 'session-create-btn';
+    btn.className = 'create-exo-btn';
+    btn.innerHTML = '✚ Créer un exercice personnalisé';
+    btn.onclick = openCreateExercice;
+    container.appendChild(btn);
+  }
+}
+
 /* ═══════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════ */
@@ -1418,6 +2318,7 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   const vmap={'nutrition':'v-journal','workout':'v-workout','explore':'v-explore'};
   if(vmap[name]){const el=document.getElementById(vmap[name]);if(el){el.classList.add('active');el.scrollTop=0;}}
+  if(name==='explore') renderExplorer();
   const tab=document.getElementById('t-'+name);if(tab)tab.classList.add('active');
 }
 
