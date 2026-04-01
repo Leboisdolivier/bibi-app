@@ -421,9 +421,12 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
     </div>
     <div class="config-title">BIBIS</div>
     <div style="font-family:'Barlow Condensed';font-size:13px;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">L'APPLICATION 💪</div>
-    <div class="config-sub" style="margin-bottom:28px">Firebase connecté ✅<br>Saisis ta clé Anthropic pour activer l'assistant IA.</div>
+    <div class="config-sub" style="margin-bottom:28px">Firebase connecté ✅<br>Tes réglages sont synchronisés sur tous tes appareils.</div>
     <div class="config-field">
       <div class="cfg-label">Anthropic API Key</div>
+      <div class="cfg-label" style="margin-bottom:6px">Ton prénom</div>
+      <input class="cfg-input" id="cfg-prenom" placeholder="Prénom…" type="text" style="margin-bottom:14px">
+      <div class="cfg-label" style="margin-bottom:6px">Anthropic API Key</div>
       <input class="cfg-input" id="cfg-claudekey" placeholder="sk-ant-api03-..." type="password" onkeydown="if(event.key==='Enter')saveClaudeKey()">
       <div style="font-family:'Barlow Condensed';font-size:11px;color:var(--dim);letter-spacing:.04em;margin-top:6px">Stockée uniquement dans ton navigateur.</div>
     </div>
@@ -700,6 +703,11 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
 ═══════════════════════════════════════ */
 let db = null, userId = 'user_demo', firebaseReady = false, claudeKey = '';
 const GOALS = {kcal:2300, prot:200, carb:280, fat:63};
+let userName = localStorage.getItem('bibis_user_name') || 'Alex';
+
+function renderGreeting(){
+  document.querySelectorAll('.user-name').forEach(el => el.textContent = userName);
+}
 const MEAL_DEFS = [{name:'Petit-déjeuner',emoji:'☀️'},{name:'Déjeuner',emoji:'🌤'},{name:'Dîner',emoji:'🌙'},{name:'Snack',emoji:'🍎'}];
 
 function setSyncDot(state){ // 'ok' | 'saving' | 'error' | 'offline'
@@ -730,8 +738,21 @@ function saveClaudeKey(){
   if(!key.startsWith('sk-ant')){ setConfigStatus('❌ Format invalide — doit commencer par sk-ant','err'); return; }
   claudeKey = key;
   localStorage.setItem('bibis_claude_key', key);
-  setConfigStatus('✅ IA activée !','ok');
-  setTimeout(()=>{ document.getElementById('config-screen').classList.remove('show'); }, 800);
+  const prenom = (document.getElementById('cfg-prenom')||{value:''}).value.trim();
+  if(prenom){ userName = prenom; localStorage.setItem('bibis_user_name', prenom); }
+  // Sauvegarder dans Firestore (sync multi-appareils)
+  if(db){
+    db.collection('users').doc(userId).set({
+      claudeKey: key,
+      userName: userName,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true}).catch(()=>{});
+  }
+  setConfigStatus('✅ Sauvegardé sur tous tes appareils !','ok');
+  setTimeout(()=>{
+    document.getElementById('config-screen').classList.remove('show');
+    renderGreeting();
+  }, 700);
 }
 
 function setConfigStatus(msg, cls){
@@ -754,16 +775,30 @@ function initFirebase(cfg){
     claudeKey = cfg.claudeKey||'';
     // Test connexion
     db.collection('_ping').doc('test').set({t: Date.now()})
-      .then(()=>{
+      .then(async ()=>{
         firebaseReady = true;
         setSyncDot('ok');
-        setConfigStatus('✅ Firebase connecté !','ok');
-        setTimeout(()=>{
-          document.getElementById('config-screen').classList.remove('show');
-          loadTodayFromFirebase();
-        }, 1000);
+        // Charger profil (clé Claude + prénom)
+        try {
+          const udoc = await db.collection('users').doc(userId).get();
+          if(udoc.exists){
+            const d = udoc.data();
+            if(d.claudeKey){ claudeKey = d.claudeKey; localStorage.setItem('bibis_claude_key', d.claudeKey); }
+            if(d.userName && d.userName !== 'Alex'){ userName = d.userName; localStorage.setItem('bibis_user_name', d.userName); }
+          }
+        } catch(e){}
+        // Fallback localStorage
+        if(!claudeKey) claudeKey = localStorage.getItem('bibis_claude_key')||'';
+        const savedName = localStorage.getItem('bibis_user_name');
+        if(savedName) userName = savedName;
+        // Afficher écran config seulement si pas de clé Claude
+        if(!claudeKey){
+          document.getElementById('config-screen').classList.add('show');
+        }
+        loadTodayFromFirebase();
+        renderGreeting();
       })
-      .catch(e=>{ setSyncDot('error'); setConfigStatus('❌ Erreur: '+e.message,'err'); });
+      .catch(e=>{ setSyncDot('error'); loadDemoData(); });
   } catch(e) {
     setSyncDot('error');
     setConfigStatus('❌ '+e.message,'err');
@@ -771,12 +806,28 @@ function initFirebase(cfg){
 }
 
 function skipConfig(){
+  const prenom = (document.getElementById('cfg-prenom')||{value:''}).value.trim();
+  if(prenom){
+    userName = prenom;
+    localStorage.setItem('bibis_user_name', prenom);
+    if(db) db.collection('users').doc(userId).set({userName:prenom},{merge:true}).catch(()=>{});
+  }
+  document.getElementById('config-screen').classList.remove('show');
+  renderGreeting();
+  const __orig = true;
+
   document.getElementById('config-screen').classList.remove('show');
   setSyncDot('offline');
   loadDemoData();
 }
 
-function showConfig(){ document.getElementById('cfg-claudekey').value=claudeKey||''; document.getElementById('config-screen').classList.add('show'); }
+function showConfig(){
+  const inp = document.getElementById('cfg-claudekey');
+  if(inp) inp.value = claudeKey||'';
+  const pn = document.getElementById('cfg-prenom');
+  if(pn) pn.value = (userName && userName!=='Alex') ? userName : '';
+  document.getElementById('config-screen').classList.add('show');
+}
 
 /* ═══════════════════════════════════════
    DATE MANAGEMENT
@@ -1213,7 +1264,7 @@ let aiLoading = false;
 function buildContext(){
   const t=totals(), wc=document.querySelectorAll('.wcup.on').length;
   const exDone=EXERCISES.map(e=>({name:e.name,sets:e.sets.filter(s=>s.done).length,totalSets:e.sets.length,volume:e.sets.filter(s=>s.done).reduce((s,se)=>s+se.kg*se.reps,0)}));
-  return `Tu es BIBIS IA, l'assistant personnel de fitness de l'application BIBIS. Tu as accès aux données en temps réel de l'utilisateur. Réponds en français, de manière directe, motivante et précise. Utilise des chiffres concrets. Max 3-4 phrases sauf si une analyse détaillée est demandée.
+  return `Tu es BIBIS IA, l'assistant personnel de fitness de l'application BIBIS. L'utilisateur s'appelle ${userName}. Appelle-le toujours par son prénom. Tu as accès aux données en temps réel de l'utilisateur. Réponds en français, de manière directe, motivante et précise. Utilise des chiffres concrets. Max 3-4 phrases sauf si une analyse détaillée est demandée.
 
 DONNÉES NUTRITION DU JOUR (${getDateKey(currentDateOffset)}):
 - Calories ingérées: ${t.kcal} kcal / objectif ${GOALS.kcal} kcal
@@ -1354,7 +1405,7 @@ const _origSwitch = switchTab;
 // Show welcome message in AI
 function initAI(){
   if(document.getElementById('ai-messages').children.length===0){
-    appendMsg('assistant','**Salut Alex ! 👋** Je suis BIBIS IA.\n\nJ\'ai accès à ta nutrition du jour et ta séance en temps réel. Pose-moi n\'importe quelle question — que manger, comment progresser, tes macros restants…\n\n*Configure ton API Key Claude dans ⚙ Config pour m\'activer pleinement.*');
+    appendMsg('assistant','**Salut ' + userName + ' ! 👋** Je suis BIBIS IA.\n\nJ\'ai accès à ta nutrition du jour et ta séance en temps réel. Pose-moi n\'importe quelle question — que manger, comment progresser, tes macros restants…\n\n*Configure ton API Key Claude dans ⚙ Config pour m\'activer pleinement.*');
   }
 }
 
