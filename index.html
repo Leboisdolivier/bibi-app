@@ -58,6 +58,8 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
 .tab-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);transition:color .2s}
 .tab.active .tab-label{color:var(--gold)}
 .tab.active::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--gold);border-radius:0 0 2px 2px;box-shadow:0 0 8px var(--gold)}
+.tab .tab-icon,.tab .tab-label{pointer-events:none}
+.tab{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 
 /* FAB */
 .fab{position:absolute;bottom:92px;right:20px;width:54px;height:54px;background:var(--gold);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#000;cursor:pointer;box-shadow:0 6px 24px var(--gold-glow);z-index:99;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
@@ -884,10 +886,10 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <div class="tab active" id="t-nutrition" onclick="switchTab('nutrition')"><div class="tab-icon">🥗</div><div class="tab-label">Nutrition</div></div>
-    <div class="tab" id="t-workout" onclick="switchTab('workout')"><div class="tab-icon">💪</div><div class="tab-label">Séances</div></div>
-    <div class="tab" id="t-ai" onclick="switchTab('ai')"><div class="tab-icon">⚡</div><div class="tab-label">IA</div></div>
-    <div class="tab" id="t-explore" onclick="switchTab('explore')"><div class="tab-icon">🔍</div><div class="tab-label">Explorer</div></div>
+    <div class="tab active" id="t-nutrition"><div class="tab-icon">🥗</div><div class="tab-label">Nutrition</div></div>
+    <div class="tab" id="t-workout"><div class="tab-icon">💪</div><div class="tab-label">Séances</div></div>
+    <div class="tab" id="t-ai"><div class="tab-icon">⚡</div><div class="tab-label">IA</div></div>
+    <div class="tab" id="t-explore"><div class="tab-icon">🔍</div><div class="tab-label">Explorer</div></div>
   </div>
 </div>
 
@@ -2284,18 +2286,6 @@ function addCreateButtonToSession(){
 /* ═══════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════ */
-const VIEWS={'nutrition':'v-journal','workout':'v-workout','ai':'v-ai','explore':'v-explore'};
-function switchTab(name){
-  Object.values(VIEWS).forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('active');if(el.classList.contains('ai-screen'))el.classList.remove('active');}});
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  const el=document.getElementById(VIEWS[name]);
-  if(el){
-    if(name==='ai'){el.classList.add('active');}
-    else{el.classList.add('active');}
-    el.scrollTop=0;
-  }
-  const tab=document.getElementById('t-'+name);if(tab)tab.classList.add('active');
-}
 function showView(id){['v-journal','v-add'].forEach(v=>{const el=document.getElementById(v);if(el)el.classList.remove('active');});const el=document.getElementById(id);if(el){el.classList.add('active');el.scrollTop=0;}}
 function goJournal(){showView('v-journal');}
 function openModal(){document.getElementById('modal').classList.add('open');}
@@ -2303,35 +2293,45 @@ function closeModal(){document.getElementById('modal').classList.remove('open');
 let toastT=null;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2400);}
 
-/* ═══════════════════════════════════════
-   INIT
-═══════════════════════════════════════ */
-// Fix ai-screen visibility
-document.getElementById('v-ai').style.display='none';
-document.addEventListener('DOMContentLoaded',()=>{});
-
-// Patch switchTab for ai-screen
-const _origSwitch = switchTab;
-
-// Show welcome message in AI
 function initAI(){
   if(document.getElementById('ai-messages').children.length===0){
     appendMsg('assistant','**Salut ' + userName + ' ! 👋** Je suis BIBIS IA.\n\nJ\'ai accès à ta nutrition du jour et ta séance en temps réel. Pose-moi n\'importe quelle question — que manger, comment progresser, tes macros restants…\n\n*Configure ton API Key Claude dans ⚙ Config pour m\'activer pleinement.*');
   }
 }
 
-// Override tab switch to handle ai-screen class
+/** Onglets : une seule implémentation (évite conflits + plantages si #v-ai absent). */
 function switchTab(name){
-  ['v-journal','v-workout','v-explore'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
-  const aiEl=document.getElementById('v-ai');
-  if(name==='ai'){aiEl.style.display='flex';if(!aiEl.classList.contains('active')){aiEl.style.animation='fadeSlide .28s cubic-bezier(.22,1,.36,1)';aiEl.classList.add('active');}initAI();}
-  else{aiEl.style.display='none';aiEl.classList.remove('active');}
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  const vmap={'nutrition':'v-journal','workout':'v-workout','explore':'v-explore'};
-  if(vmap[name]){const el=document.getElementById(vmap[name]);if(el){el.classList.add('active');el.scrollTop=0;}}
+  ['v-journal','v-workout','v-explore'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('active');});
+  var aiEl=document.getElementById('v-ai');
+  if(aiEl){
+    if(name==='ai'){
+      aiEl.classList.add('active');
+      initAI();
+    }else{
+      aiEl.classList.remove('active');
+    }
+  }
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  var vmap={nutrition:'v-journal',workout:'v-workout',explore:'v-explore'};
+  if(vmap[name]){
+    var vEl=document.getElementById(vmap[name]);
+    if(vEl){vEl.classList.add('active');vEl.scrollTop=0;}
+  }
   if(name==='explore') renderExplorer();
-  const tab=document.getElementById('t-'+name);if(tab)tab.classList.add('active');
+  var tab=document.getElementById('t-'+name);
+  if(tab) tab.classList.add('active');
 }
+
+document.addEventListener('DOMContentLoaded',function(){
+  var bar=document.querySelector('.tab-bar');
+  if(!bar) return;
+  bar.addEventListener('click',function(ev){
+    var t=ev.target.closest('.tab');
+    if(!t||!t.id||t.id.indexOf('t-')!==0) return;
+    var id=t.id.slice(2);
+    if(id==='nutrition'||id==='workout'||id==='ai'||id==='explore'){ev.preventDefault();switchTab(id);}
+  });
+});
 
 function loadConfig(){
   // Firebase hardcodé — récupère uniquement la clé Claude depuis localStorage
