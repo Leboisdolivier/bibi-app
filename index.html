@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>BIBIS — L'Application</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
@@ -434,6 +434,17 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-left:6px;animation:pulseDot 2s infinite}
 .sync-dot.saving{background:var(--gold)}
 .sync-dot.error{background:var(--red);animation:none}
+
+/* Téléphones réels : la barre d’onglets et le FAB ne doivent pas se retrouver hors écran */
+@media (max-width:520px){
+  body{padding:0;min-height:100dvh;align-items:stretch}
+  .badge{top:max(14px, env(safe-area-inset-top, 0px));right:max(14px, env(safe-area-inset-right, 0px))}
+  .phone{width:100%;max-width:none;min-height:100dvh;height:100dvh;border-radius:0;box-shadow:none}
+  .view{height:calc(100dvh - 68px)}
+  .ai-screen{height:calc(100dvh - 68px)}
+  .tab-bar{padding:10px 4px max(10px, env(safe-area-inset-bottom, 0px))}
+  .fab{bottom:calc(92px + env(safe-area-inset-bottom, 0px))}
+}
 </style>
 </head>
 <body>
@@ -873,9 +884,9 @@ body{background:#111008;font-family:'Barlow',sans-serif;color:var(--cream);
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <div class="tab" id="t-nutrition" onclick="switchTab('nutrition')"><div class="tab-icon">🥗</div><div class="tab-label">Nutrition</div></div>
+    <div class="tab active" id="t-nutrition" onclick="switchTab('nutrition')"><div class="tab-icon">🥗</div><div class="tab-label">Nutrition</div></div>
     <div class="tab" id="t-workout" onclick="switchTab('workout')"><div class="tab-icon">💪</div><div class="tab-label">Séances</div></div>
-    <div class="tab active" id="t-ai" onclick="switchTab('ai')"><div class="tab-icon">⚡</div><div class="tab-label">IA</div></div>
+    <div class="tab" id="t-ai" onclick="switchTab('ai')"><div class="tab-icon">⚡</div><div class="tab-label">IA</div></div>
     <div class="tab" id="t-explore" onclick="switchTab('explore')"><div class="tab-icon">🔍</div><div class="tab-label">Explorer</div></div>
   </div>
 </div>
@@ -2342,7 +2353,7 @@ function loadConfig(){
 // INIT
 loadConfig();
 setSyncDot('offline');
-switchTab('ai');
+switchTab('nutrition');
 </script>
 </body>
 </html>
