@@ -1,81 +1,269 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import {
+  View, Text, StyleSheet, ScrollView,
+  TouchableOpacity, FlatList,
+} from 'react-native';
+import ActiveWorkout from '../components/ActiveWorkout';
+import { PROGRAMS, getExercise } from '../services/exerciseDB';
+
+const DEMO_HISTORY = [
+  {
+    id: 'h1',
+    name: 'Push',
+    date: new Date(Date.now() - 86400000).toISOString(),
+    duration: 2640,
+    exercises: [
+      { name: 'Développé couché',   sets: [{ weight: '80', reps: '8' }, { weight: '80', reps: '8' }, { weight: '80', reps: '7' }] },
+      { name: 'Développé incliné',  sets: [{ weight: '60', reps: '10' }, { weight: '60', reps: '9' }] },
+      { name: 'Développé militaire',sets: [{ weight: '50', reps: '10' }, { weight: '50', reps: '8' }] },
+    ],
+  },
+  {
+    id: 'h2',
+    name: 'Pull',
+    date: new Date(Date.now() - 2 * 86400000).toISOString(),
+    duration: 2280,
+    exercises: [
+      { name: 'Soulevé de terre',   sets: [{ weight: '100', reps: '6' }, { weight: '100', reps: '6' }] },
+      { name: 'Tirage nuque poulie',sets: [{ weight: '70', reps: '10' }, { weight: '70', reps: '10' }] },
+      { name: 'Curl barre',         sets: [{ weight: '35', reps: '10' }, { weight: '35', reps: '9' }] },
+    ],
+  },
+];
 
 export default function WorkoutScreen() {
-  const workouts = [
-    { id: '1', name: 'Full body', date: 'Aujourd\'hui', exercises: 8, duration: '45 min' },
-    { id: '2', name: 'Push', date: 'Hier', exercises: 6, duration: '40 min' },
-    { id: '3', name: 'Pull', date: 'Il y a 2 jours', exercises: 6, duration: '38 min' },
-  ];
+  const [history, setHistory]       = useState(DEMO_HISTORY);
+  const [activeWorkout, setActive]  = useState(null); // null | { template }
+
+  const handleStart = useCallback((template = null) => {
+    setActive({ template });
+  }, []);
+
+  const handleFinish = useCallback((result) => {
+    setHistory(prev => [result, ...prev]);
+    setActive(null);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    setActive(null);
+  }, []);
+
+  // ── Séance en cours ──────────────────────────────────────────
+  if (activeWorkout !== null) {
+    return (
+      <ActiveWorkout
+        template={activeWorkout.template}
+        onFinish={handleFinish}
+        onCancel={handleCancel}
+      />
+    );
+  }
+
+  // ── Dashboard ────────────────────────────────────────────────
+  const weekVol = history
+    .filter(w => Date.now() - new Date(w.date) < 7 * 86400000)
+    .reduce((a, w) => a + workoutVolume(w), 0);
+
+  const weekSessions = history.filter(w => Date.now() - new Date(w.date) < 7 * 86400000).length;
+  const totalSets    = history.reduce((a, w) => a + w.exercises.reduce((b, e) => b + e.sets.length, 0), 0);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Entraînements</Text>
-      <Text style={styles.subtitle}>Suivez vos séances et votre progression</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <Text style={styles.pageTitle}>Entraînements</Text>
 
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>+ Nouvelle séance</Text>
+      {/* Bouton séance libre */}
+      <TouchableOpacity style={styles.startBtn} onPress={() => handleStart(null)}>
+        <Text style={styles.startBtnIcon}>🏋️</Text>
+        <View>
+          <Text style={styles.startBtnTitle}>Démarrer une séance</Text>
+          <Text style={styles.startBtnSub}>Séance libre · ajoutez vos exercices</Text>
+        </View>
+        <Text style={styles.startArrow}>›</Text>
       </TouchableOpacity>
 
-      <Text style={styles.sectionTitle}>Séances récentes</Text>
-      {workouts.map((w) => (
-        <View key={w.id} style={styles.workoutCard}>
-          <View style={styles.workoutHeader}>
-            <Text style={styles.workoutName}>{w.name}</Text>
-            <Text style={styles.workoutDate}>{w.date}</Text>
-          </View>
-          <View style={styles.workoutStats}>
-            <Text style={styles.stat}>{w.exercises} exercices</Text>
-            <Text style={styles.stat}>{w.duration}</Text>
-          </View>
-        </View>
-      ))}
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Progression</Text>
-        <Text style={styles.cardText}>
-          Les graphiques de progression (charges, volume, performances) seront disponibles dans une prochaine version.
-        </Text>
+      {/* Statistiques semaine */}
+      <View style={styles.statsRow}>
+        <StatCard label="Séances / semaine" value={weekSessions} icon="📅" />
+        <StatCard label="Volume total (kg)" value={weekVol > 0 ? Math.round(weekVol).toLocaleString('fr') : '—'} icon="⚖️" />
+        <StatCard label="Séries au total" value={totalSets} icon="🔢" />
       </View>
+
+      {/* Templates programmes */}
+      <Text style={styles.sectionTitle}>Programmes rapides</Text>
+      <FlatList
+        data={PROGRAMS}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={p => p.id}
+        contentContainerStyle={styles.programList}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.programCard} onPress={() => handleStart(item)}>
+            <Text style={styles.programEmoji}>{item.emoji}</Text>
+            <Text style={styles.programName}>{item.name}</Text>
+            <Text style={styles.programDesc}>{item.description}</Text>
+            <Text style={styles.programCount}>{item.exercises.length} exercices</Text>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Historique */}
+      <Text style={styles.sectionTitle}>Historique</Text>
+      {history.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>🏆</Text>
+          <Text style={styles.emptyText}>Pas encore de séance</Text>
+          <Text style={styles.emptyHint}>Lance ta première séance !</Text>
+        </View>
+      ) : (
+        history.map(w => <HistoryCard key={w.id} workout={w} />)
+      )}
     </ScrollView>
   );
 }
 
+// ─── Carte historique ─────────────────────────────────────────────────────────
+function HistoryCard({ workout }) {
+  const [expanded, setExpanded] = useState(false);
+  const vol = workoutVolume(workout);
+  const sets = workout.exercises.reduce((a, e) => a + e.sets.length, 0);
+
+  return (
+    <TouchableOpacity
+      style={styles.historyCard}
+      onPress={() => setExpanded(e => !e)}
+      activeOpacity={0.85}
+    >
+      <View style={styles.historyHeader}>
+        <View style={styles.historyLeft}>
+          <Text style={styles.historyName}>{workout.name}</Text>
+          <Text style={styles.historyDate}>{formatDate(workout.date)}</Text>
+        </View>
+        <View style={styles.historyRight}>
+          <Text style={styles.historyDuration}>{formatTime(workout.duration)}</Text>
+          <Text style={styles.historyExpand}>{expanded ? '▲' : '▼'}</Text>
+        </View>
+      </View>
+
+      <View style={styles.historyMeta}>
+        <MetaChip label={`${workout.exercises.length} exercices`} />
+        <MetaChip label={`${sets} séries`} />
+        {vol > 0 && <MetaChip label={`${Math.round(vol).toLocaleString('fr')} kg`} color="#4ecdc4" />}
+      </View>
+
+      {expanded && (
+        <View style={styles.historyDetail}>
+          {workout.exercises.map((ex, i) => {
+            const bestSet = [...ex.sets].sort((a, b) => (parseFloat(b.weight) || 0) - (parseFloat(a.weight) || 0))[0];
+            return (
+              <View key={i} style={styles.historyExRow}>
+                <Text style={styles.historyExName}>{ex.name}</Text>
+                <Text style={styles.historyExSets}>
+                  {ex.sets.length} × {bestSet?.reps ?? '?'} reps
+                  {bestSet?.weight ? ` @ ${bestSet.weight} kg` : ''}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+}
+
+function StatCard({ label, value, icon }) {
+  return (
+    <View style={styles.statCard}>
+      <Text style={styles.statIcon}>{icon}</Text>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function MetaChip({ label, color = '#8892b0' }) {
+  return <Text style={[styles.metaChip, { color }]}>{label}</Text>;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function workoutVolume(w) {
+  return w.exercises.reduce((a, ex) =>
+    a + ex.sets.reduce((b, s) =>
+      b + (parseFloat(s.weight) || 0) * (parseInt(s.reps) || 0), 0), 0);
+}
+
+function formatTime(s) {
+  if (!s) return '—';
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (h > 0) return `${h}h${String(m).padStart(2, '0')}`;
+  return `${m}min${String(sec).padStart(2, '0')}`;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return 'Aujourd\'hui';
+  if (diff === 1) return 'Hier';
+  if (diff < 7)  return `Il y a ${diff} jours`;
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0f0f23' },
   content: { padding: 20, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#8892b0', marginBottom: 24 },
-  addButton: {
-    backgroundColor: '#e94560',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 24,
+
+  pageTitle: { fontSize: 26, fontWeight: '800', color: '#fff', marginBottom: 18 },
+
+  startBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: '#e94560', borderRadius: 16, padding: 18, marginBottom: 20,
   },
-  addButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff', marginBottom: 12 },
-  workoutCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#16213e',
+  startBtnIcon: { fontSize: 28 },
+  startBtnTitle: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  startBtnSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  startArrow: { color: '#fff', fontSize: 24, marginLeft: 'auto' },
+
+  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  statCard: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 14, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
+  statIcon: { fontSize: 20, marginBottom: 6 },
+  statValue: { color: '#e94560', fontWeight: '800', fontSize: 15 },
+  statLabel: { color: '#8892b0', fontSize: 10, textAlign: 'center', marginTop: 3 },
+
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 12 },
+
+  programList: { paddingBottom: 4, gap: 12 },
+  programCard: {
+    backgroundColor: '#1a1a2e', borderRadius: 14, padding: 16, width: 140,
+    borderWidth: 1, borderColor: '#16213e', marginRight: 12,
   },
-  workoutHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  workoutName: { fontSize: 18, fontWeight: '600', color: '#fff' },
-  workoutDate: { fontSize: 12, color: '#8892b0' },
-  workoutStats: { flexDirection: 'row', gap: 16, marginTop: 8 },
-  stat: { fontSize: 14, color: '#e94560' },
-  card: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 16,
-    padding: 20,
-    marginTop: 16,
-    borderWidth: 1,
-    borderColor: '#16213e',
+  programEmoji: { fontSize: 28, marginBottom: 8 },
+  programName: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  programDesc: { color: '#8892b0', fontSize: 11, marginTop: 4, lineHeight: 16 },
+  programCount: { color: '#e94560', fontSize: 11, marginTop: 8, fontWeight: '600' },
+
+  historyCard: {
+    backgroundColor: '#1a1a2e', borderRadius: 14, padding: 16,
+    marginBottom: 12, borderWidth: 1, borderColor: '#16213e',
   },
-  cardTitle: { fontSize: 18, fontWeight: '600', color: '#e94560', marginBottom: 8 },
-  cardText: { fontSize: 14, color: '#8892b0', lineHeight: 22 },
+  historyHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  historyLeft: {},
+  historyName: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  historyDate: { color: '#8892b0', fontSize: 12, marginTop: 2 },
+  historyRight: { alignItems: 'flex-end', gap: 4 },
+  historyDuration: { color: '#e94560', fontWeight: '600', fontSize: 14 },
+  historyExpand: { color: '#8892b0', fontSize: 12 },
+  historyMeta: { flexDirection: 'row', gap: 10, marginTop: 10, flexWrap: 'wrap' },
+  metaChip: { fontSize: 12, fontWeight: '500' },
+  historyDetail: { marginTop: 12, borderTopWidth: 1, borderTopColor: '#16213e', paddingTop: 12, gap: 8 },
+  historyExRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  historyExName: { color: '#fff', fontSize: 13 },
+  historyExSets: { color: '#8892b0', fontSize: 12 },
+
+  emptyState: { alignItems: 'center', paddingVertical: 40 },
+  emptyEmoji: { fontSize: 48, marginBottom: 14 },
+  emptyText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  emptyHint: { color: '#8892b0', fontSize: 13, marginTop: 6 },
 });
