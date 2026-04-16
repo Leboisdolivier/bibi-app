@@ -10,10 +10,14 @@ import {
   Modal,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import BarcodeScanner from '../components/BarcodeScanner';
 import ProductModal from '../components/ProductModal';
+import FoodVisionModal from '../components/FoodVisionModal';
 import { searchProducts } from '../services/openFoodFacts';
+import { analyzeFood } from '../services/foodVision';
 
 // Objectifs journaliers par défaut (sera personnalisable depuis le Profil)
 const DAILY_GOALS = { calories: 2200, protein: 150, carbs: 250, fat: 75 };
@@ -40,12 +44,63 @@ export default function NutritionScreen() {
     },
   ]);
 
-  const [showScanner, setShowScanner] = useState(false);
-  const [showSearch, setShowSearch]   = useState(false);
+  const [showScanner, setShowScanner]       = useState(false);
+  const [showSearch, setShowSearch]         = useState(false);
   const [scannedProduct, setScannedProduct] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchQuery, setSearchQuery]       = useState('');
+  const [searchResults, setSearchResults]   = useState([]);
+  const [searchLoading, setSearchLoading]   = useState(false);
+
+  // --- Vision IA ---
+  const [visionResult, setVisionResult]   = useState(null);
+  const [visionLoading, setVisionLoading] = useState(false);
+
+  const handlePhotoAnalysis = useCallback(async (source = 'camera') => {
+    let imageUri = null;
+
+    if (source === 'camera') {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission requise', 'Autorisez l\'accès à la caméra.');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        quality: 0.8,
+      });
+      if (result.canceled) return;
+      imageUri = result.assets[0].uri;
+    } else {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission requise', 'Autorisez l\'accès aux photos.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.8,
+      });
+      if (result.canceled) return;
+      imageUri = result.assets[0].uri;
+    }
+
+    setVisionLoading(true);
+    try {
+      const analysis = await analyzeFood(imageUri);
+      setVisionResult({ ...analysis, imageUri });
+    } catch (e) {
+      if (e.message === 'CLE_MANQUANTE') {
+        Alert.alert(
+          'Clé API manquante',
+          'Ajoutez votre clé Anthropic dans le fichier .env\n(EXPO_PUBLIC_ANTHROPIC_API_KEY=sk-ant-...)'
+        );
+      } else {
+        Alert.alert('Erreur', `Impossible d'analyser la photo.\n${e.message}`);
+      }
+    } finally {
+      setVisionLoading(false);
+    }
+  }, []);
 
   // --- Totaux ---
   const totals = entries.reduce(
@@ -116,14 +171,34 @@ export default function NutritionScreen() {
         {/* Boutons d'ajout */}
         <View style={styles.addRow}>
           <TouchableOpacity style={styles.addBtn} onPress={() => setShowScanner(true)}>
-            <Text style={styles.addBtnIcon}>📷</Text>
-            <Text style={styles.addBtnText}>Scanner</Text>
+            <Text style={styles.addBtnIcon}>📦</Text>
+            <Text style={styles.addBtnText}>Code-barres</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.addBtn, styles.addBtnAI]}
+            onPress={() => handlePhotoAnalysis('camera')}
+            disabled={visionLoading}
+          >
+            {visionLoading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.addBtnIcon}>🤖</Text>
+            )}
+            <Text style={styles.addBtnText}>Photo IA</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.addBtn} onPress={() => setShowSearch(true)}>
             <Text style={styles.addBtnIcon}>🔍</Text>
             <Text style={styles.addBtnText}>Rechercher</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Chargement IA */}
+        {visionLoading && (
+          <View style={styles.visionLoadingBanner}>
+            <ActivityIndicator color="#e94560" size="small" />
+            <Text style={styles.visionLoadingText}>  Analyse du repas en cours…</Text>
+          </View>
+        )}
 
         {/* Journal par repas */}
         {MEAL_ORDER.filter(t => grouped[t]).map(type => (
@@ -162,6 +237,20 @@ export default function NutritionScreen() {
           visible={!!scannedProduct}
           onAdd={handleAddEntry}
           onClose={() => setScannedProduct(null)}
+        />
+      )}
+
+      {/* Modal résultat analyse IA */}
+      {visionResult && (
+        <FoodVisionModal
+          result={visionResult}
+          visible={!!visionResult}
+          onAdd={(entry) => {
+            handleAddEntry(entry);
+            setVisionResult(null);
+          }}
+          onRetry={() => { setVisionResult(null); handlePhotoAnalysis('camera'); }}
+          onClose={() => setVisionResult(null)}
         />
       )}
 
@@ -359,8 +448,11 @@ const styles = StyleSheet.create({
   // Boutons ajout
   addRow: { flexDirection: 'row', gap: 12, marginBottom: 22 },
   addBtn: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 14, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
+  addBtnAI: { borderColor: '#e94560', backgroundColor: '#1a0a10' },
   addBtnIcon: { fontSize: 26, marginBottom: 6 },
-  addBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  addBtnText: { color: '#fff', fontWeight: '600', fontSize: 13 },
+  visionLoadingBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1a0a10', borderRadius: 10, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: '#e94560' },
+  visionLoadingText: { color: '#e94560', fontSize: 14 },
 
   // Groupes repas
   mealGroup: { marginBottom: 18 },
