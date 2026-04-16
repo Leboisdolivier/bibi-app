@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Bibis",
+    "slug": "bibis-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a2e"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bibis.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Pour photographier vos repas et suivre votre nutrition",
+        "NSPhotoLibraryUsageDescription": "Pour enregistrer et sélectionner des photos de vos repas"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a1a2e"
+      },
+      "package": "com.bibis.app",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Autoriser l'accès à la caméra pour photographier vos repas"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autoriser l'accès aux photos pour ajouter des images de repas"
+        }
+      ]
+    ]
+  }
+}
