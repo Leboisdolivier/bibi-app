@@ -85,9 +85,10 @@ export default function ExercisePicker({ visible, onSelect, onClose }) {
           />
         )}
 
-        {/* Résultats ou grille groupes */}
-        {list !== null ? (
+        {/* Résultats liste (recherche ou filtre muscle) */}
+        {list !== null && (
           <FlatList
+            key="list"
             data={list}
             keyExtractor={e => e.id}
             contentContainerStyle={{ paddingBottom: 40 }}
@@ -104,9 +105,12 @@ export default function ExercisePicker({ visible, onSelect, onClose }) {
               <Text style={styles.empty}>Aucun exercice trouvé</Text>
             }
           />
-        ) : (
-          /* Grille groupes musculaires */
+        )}
+
+        {/* Grille groupes musculaires */}
+        {list === null && (
           <FlatList
+            key="grid"
             data={MUSCLE_GROUPS}
             keyExtractor={g => g.id}
             numColumns={2}
