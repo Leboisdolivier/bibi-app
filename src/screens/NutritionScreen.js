@@ -13,14 +13,15 @@ import {
   Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useProfile } from '../context/ProfileContext';
 import BarcodeScanner from '../components/BarcodeScanner';
 import ProductModal from '../components/ProductModal';
 import FoodVisionModal from '../components/FoodVisionModal';
 import { searchProducts } from '../services/openFoodFacts';
 import { analyzeFood } from '../services/foodVision';
 
-// Objectifs journaliers par défaut (sera personnalisable depuis le Profil)
-const DAILY_GOALS = { calories: 2200, protein: 150, carbs: 250, fat: 75 };
+// Objectifs par défaut (remplacés par ceux du profil si renseigné)
+const DEFAULT_GOALS = { calories: 2200, protein: 150, carbs: 250, fat: 75 };
 
 const MEAL_LABELS = {
   breakfast: { label: 'Petit-déjeuner', emoji: '🌅' },
@@ -31,6 +32,10 @@ const MEAL_LABELS = {
 const MEAL_ORDER = ['breakfast', 'lunch', 'snack', 'dinner'];
 
 export default function NutritionScreen() {
+  const { profile } = useProfile();
+  const DAILY_GOALS = profile?.calorieTarget
+    ? { calories: profile.calorieTarget, ...profile.macros }
+    : DEFAULT_GOALS;
   const [entries, setEntries] = useState([
     {
       id: '1', name: 'Flocons d\'avoine', brand: 'Quaker',
