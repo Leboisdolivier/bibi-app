@@ -4,6 +4,10 @@ dist/
 web-build/
 android/
 ios/
+.firebase/
+.tmp.driveupload/
+.claude/
+*.bak
 *.jks
 *.p8
 *.p12
