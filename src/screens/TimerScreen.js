@@ -47,13 +47,13 @@ export default function TimerScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f23', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 40 },
-  time: { fontSize: 72, fontWeight: '200', color: '#e94560', fontVariant: ['tabular-nums'], marginBottom: 60 },
+  container: { flex: 1, backgroundColor: '#100800', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  title: { fontSize: 24, fontWeight: '900', color: '#FFF5E8', marginBottom: 40, letterSpacing: -0.5 },
+  time: { fontSize: 80, fontWeight: '900', color: '#E8291C', fontVariant: ['tabular-nums'], marginBottom: 60 },
   buttons: { flexDirection: 'row', gap: 16 },
   button: { paddingHorizontal: 32, paddingVertical: 16, borderRadius: 12 },
-  buttonStart: { backgroundColor: '#0f3460' },
-  buttonStop: { backgroundColor: '#e94560' },
-  buttonReset: { backgroundColor: '#16213e', paddingHorizontal: 24, paddingVertical: 16, borderRadius: 12 },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
+  buttonStart: { backgroundColor: '#1855CC' },
+  buttonStop: { backgroundColor: '#E8291C' },
+  buttonReset: { backgroundColor: '#2C1810', paddingHorizontal: 24, paddingVertical: 16, borderRadius: 12 },
+  buttonText: { color: '#FFF5E8', fontSize: 18, fontWeight: '600' },
 });

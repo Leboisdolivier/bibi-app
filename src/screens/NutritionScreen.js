@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import ProductModal from '../components/ProductModal';
 import FoodVisionModal from '../components/FoodVisionModal';
 import { searchProducts } from '../services/openFoodFacts';
 import { analyzeFood } from '../services/foodVision';
+import { loadTodayEntries, saveTodayEntries } from '../services/storage';
 
 // Objectifs par défaut (remplacés par ceux du profil si renseigné)
 const DEFAULT_GOALS = { calories: 2200, protein: 150, carbs: 250, fat: 75 };
@@ -36,18 +37,18 @@ export default function NutritionScreen() {
   const DAILY_GOALS = profile?.calorieTarget
     ? { calories: profile.calorieTarget, ...profile.macros }
     : DEFAULT_GOALS;
-  const [entries, setEntries] = useState([
-    {
-      id: '1', name: 'Flocons d\'avoine', brand: 'Quaker',
-      mealType: 'breakfast', time: '08:00', grams: 80, image: null,
-      calories: 295, protein: 10, carbs: 52, fat: 5,
-    },
-    {
-      id: '2', name: 'Poulet grillé', brand: '',
-      mealType: 'lunch', time: '12:30', grams: 150, image: null,
-      calories: 248, protein: 47, carbs: 0, fat: 5,
-    },
-  ]);
+  const [entries, setEntries] = useState([]);
+
+  // Charge les entrées du jour au démarrage
+  useEffect(() => {
+    loadTodayEntries().then(saved => { if (saved.length) setEntries(saved); });
+  }, []);
+
+  // Sauvegarde à chaque modification
+  const updateEntries = useCallback((newEntries) => {
+    setEntries(newEntries);
+    saveTodayEntries(newEntries);
+  }, []);
 
   const [showScanner, setShowScanner]       = useState(false);
   const [showSearch, setShowSearch]         = useState(false);
@@ -141,7 +142,11 @@ export default function NutritionScreen() {
 
   // --- Ajout d'un aliment ---
   const handleAddEntry = useCallback((entry) => {
-    setEntries(prev => [...prev, entry]);
+    setEntries(prev => {
+      const next = [...prev, entry];
+      saveTodayEntries(next);
+      return next;
+    });
     setScannedProduct(null);
     setShowSearch(false);
     setSearchQuery('');
@@ -150,7 +155,11 @@ export default function NutritionScreen() {
 
   // --- Suppression ---
   const handleDelete = useCallback((id) => {
-    setEntries(prev => prev.filter(e => e.id !== id));
+    setEntries(prev => {
+      const next = prev.filter(e => e.id !== id);
+      saveTodayEntries(next);
+      return next;
+    });
   }, []);
 
   // --- Groupes par repas ---
@@ -200,7 +209,7 @@ export default function NutritionScreen() {
         {/* Chargement IA */}
         {visionLoading && (
           <View style={styles.visionLoadingBanner}>
-            <ActivityIndicator color="#e94560" size="small" />
+            <ActivityIndicator color="#E8291C" size="small" />
             <Text style={styles.visionLoadingText}>  Analyse du repas en cours…</Text>
           </View>
         )}
@@ -294,7 +303,7 @@ function SummaryCard({ totals, goals }) {
 
       {/* Barre calories */}
       <View style={styles.progressBg}>
-        <View style={[styles.progressFill, { width: `${caloriesPct}%`, backgroundColor: caloriesPct > 95 ? '#f7b731' : '#e94560' }]} />
+        <View style={[styles.progressFill, { width: `${caloriesPct}%`, backgroundColor: caloriesPct > 95 ? '#F59E0B' : '#E8291C' }]} />
       </View>
 
       {/* Barres macros */}
@@ -381,13 +390,13 @@ function SearchModal({ visible, query, results, loading, onChangeQuery, onSelect
           <TextInput
             style={styles.searchInput}
             placeholder="Ex : yaourt nature, riz basmati…"
-            placeholderTextColor="#8892b0"
+            placeholderTextColor="#7A5540"
             value={query}
             onChangeText={onChangeQuery}
             autoFocus
             returnKeyType="search"
           />
-          {loading && <ActivityIndicator color="#e94560" size="small" />}
+          {loading && <ActivityIndicator color="#E8291C" size="small" />}
         </View>
 
         <FlatList
@@ -425,79 +434,79 @@ function SearchModal({ visible, query, results, loading, onChangeQuery, onSelect
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f23' },
+  root: { flex: 1, backgroundColor: '#100800' },
   container: { flex: 1 },
   content: { padding: 20, paddingBottom: 40 },
 
-  pageTitle: { fontSize: 26, fontWeight: '800', color: '#fff' },
-  date: { fontSize: 14, color: '#8892b0', marginBottom: 20, marginTop: 2, textTransform: 'capitalize' },
+  pageTitle: { fontSize: 26, fontWeight: '900', color: '#FFF5E8', letterSpacing: -0.5 },
+  date: { fontSize: 14, color: '#C4956A', marginBottom: 20, marginTop: 2, textTransform: 'capitalize' },
 
   // Summary
-  summaryCard: { backgroundColor: '#1a1a2e', borderRadius: 18, padding: 18, marginBottom: 18, borderWidth: 1, borderColor: '#16213e' },
+  summaryCard: { backgroundColor: '#1E1008', borderRadius: 18, padding: 18, marginBottom: 18, borderWidth: 1, borderColor: '#3D2015' },
   summaryTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 },
-  summaryCalLabel: { color: '#8892b0', fontSize: 13 },
-  summaryCalValue: { fontSize: 38, fontWeight: '800', color: '#e94560', lineHeight: 44 },
-  summaryCalGoal: { color: '#8892b0', fontSize: 13 },
-  summaryRemainingBox: { alignItems: 'center', backgroundColor: '#16213e', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
-  summaryRemainingValue: { fontSize: 22, fontWeight: '700', color: '#fff' },
-  summaryRemainingLabel: { color: '#8892b0', fontSize: 11, marginTop: 2 },
-  progressBg: { height: 8, backgroundColor: '#16213e', borderRadius: 4, overflow: 'hidden', marginBottom: 18 },
+  summaryCalLabel: { color: '#C4956A', fontSize: 13 },
+  summaryCalValue: { fontSize: 38, fontWeight: '800', color: '#E8291C', lineHeight: 44 },
+  summaryCalGoal: { color: '#C4956A', fontSize: 13 },
+  summaryRemainingBox: { alignItems: 'center', backgroundColor: '#2C1810', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
+  summaryRemainingValue: { fontSize: 22, fontWeight: '700', color: '#FFF5E8' },
+  summaryRemainingLabel: { color: '#C4956A', fontSize: 11, marginTop: 2 },
+  progressBg: { height: 8, backgroundColor: '#2C1810', borderRadius: 4, overflow: 'hidden', marginBottom: 18 },
   progressFill: { height: '100%', borderRadius: 4 },
   macrosRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   macroBarItem: { flex: 1, alignItems: 'center' },
-  macroBarBg: { width: '100%', height: 6, backgroundColor: '#16213e', borderRadius: 3, overflow: 'hidden', marginBottom: 5 },
+  macroBarBg: { width: '100%', height: 6, backgroundColor: '#2C1810', borderRadius: 3, overflow: 'hidden', marginBottom: 5 },
   macroBarFill: { height: '100%', borderRadius: 3 },
   macroBarValue: { fontSize: 14, fontWeight: '700' },
-  macroBarLabel: { color: '#8892b0', fontSize: 11, marginTop: 2 },
+  macroBarLabel: { color: '#C4956A', fontSize: 11, marginTop: 2 },
 
   // Boutons ajout
   addRow: { flexDirection: 'row', gap: 12, marginBottom: 22 },
-  addBtn: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 14, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
-  addBtnAI: { borderColor: '#e94560', backgroundColor: '#1a0a10' },
+  addBtn: { flex: 1, backgroundColor: '#1E1008', borderRadius: 14, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#3D2015' },
+  addBtnAI: { borderColor: '#E8291C', backgroundColor: '#2C1810' },
   addBtnIcon: { fontSize: 26, marginBottom: 6 },
-  addBtnText: { color: '#fff', fontWeight: '600', fontSize: 13 },
-  visionLoadingBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1a0a10', borderRadius: 10, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: '#e94560' },
-  visionLoadingText: { color: '#e94560', fontSize: 14 },
+  addBtnText: { color: '#FFF5E8', fontWeight: '600', fontSize: 13 },
+  visionLoadingBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#2C1810', borderRadius: 10, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: '#E8291C' },
+  visionLoadingText: { color: '#E8291C', fontSize: 14 },
 
   // Groupes repas
   mealGroup: { marginBottom: 18 },
   mealGroupHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   mealGroupEmoji: { fontSize: 18, marginRight: 8 },
-  mealGroupLabel: { flex: 1, color: '#fff', fontWeight: '700', fontSize: 16 },
-  mealGroupCals: { color: '#e94560', fontWeight: '600', fontSize: 14 },
+  mealGroupLabel: { flex: 1, color: '#FFF5E8', fontWeight: '700', fontSize: 16 },
+  mealGroupCals: { color: '#E8291C', fontWeight: '600', fontSize: 14 },
 
   // Entrée
-  entryRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1a2e', borderRadius: 12, padding: 10, marginBottom: 8, borderWidth: 1, borderColor: '#16213e' },
-  entryImage: { width: 48, height: 48, borderRadius: 8, backgroundColor: '#16213e' },
-  entryImagePlaceholder: { width: 48, height: 48, borderRadius: 8, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
+  entryRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1008', borderRadius: 12, padding: 10, marginBottom: 8, borderWidth: 1, borderColor: '#3D2015' },
+  entryImage: { width: 48, height: 48, borderRadius: 8, backgroundColor: '#2C1810' },
+  entryImagePlaceholder: { width: 48, height: 48, borderRadius: 8, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
   entryInfo: { flex: 1, marginLeft: 10 },
-  entryName: { color: '#fff', fontWeight: '600', fontSize: 14 },
-  entryBrand: { color: '#8892b0', fontSize: 11, marginTop: 1 },
-  entryMacros: { color: '#e94560', fontSize: 11, marginTop: 3 },
+  entryName: { color: '#FFF5E8', fontWeight: '600', fontSize: 14 },
+  entryBrand: { color: '#C4956A', fontSize: 11, marginTop: 1 },
+  entryMacros: { color: '#E8291C', fontSize: 11, marginTop: 3 },
   deleteBtn: { padding: 8 },
-  deleteBtnText: { color: '#8892b0', fontSize: 16 },
+  deleteBtnText: { color: '#C4956A', fontSize: 16 },
 
   // Empty
   emptyState: { alignItems: 'center', paddingVertical: 48 },
   emptyEmoji: { fontSize: 52, marginBottom: 16 },
-  emptyText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  emptyHint: { color: '#8892b0', fontSize: 13, marginTop: 8, textAlign: 'center' },
+  emptyText: { color: '#FFF5E8', fontSize: 16, fontWeight: '600' },
+  emptyHint: { color: '#C4956A', fontSize: 13, marginTop: 8, textAlign: 'center' },
 
   // Search modal
-  searchContainer: { flex: 1, backgroundColor: '#0f0f23', padding: 20 },
+  searchContainer: { flex: 1, backgroundColor: '#100800', padding: 20 },
   searchHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingTop: 8 },
-  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
-  closeBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  searchTitle: { fontSize: 17, fontWeight: '700', color: '#fff' },
-  searchInputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1a2e', borderRadius: 12, paddingHorizontal: 14, marginBottom: 16, borderWidth: 1, borderColor: '#16213e' },
+  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { color: '#FFF5E8', fontSize: 16, fontWeight: '700' },
+  searchTitle: { fontSize: 17, fontWeight: '700', color: '#FFF5E8' },
+  searchInputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1008', borderRadius: 12, paddingHorizontal: 14, marginBottom: 16, borderWidth: 1, borderColor: '#3D2015' },
   searchIcon: { fontSize: 16, marginRight: 8 },
-  searchInput: { flex: 1, color: '#fff', fontSize: 16, paddingVertical: 14 },
-  searchResultRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#16213e' },
-  searchResultImg: { width: 52, height: 52, borderRadius: 8, backgroundColor: '#16213e' },
-  searchResultImgPlaceholder: { width: 52, height: 52, borderRadius: 8, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
+  searchInput: { flex: 1, color: '#FFF5E8', fontSize: 16, paddingVertical: 14 },
+  searchResultRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#3D2015' },
+  searchResultImg: { width: 52, height: 52, borderRadius: 8, backgroundColor: '#2C1810' },
+  searchResultImgPlaceholder: { width: 52, height: 52, borderRadius: 8, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
   searchResultInfo: { flex: 1, marginLeft: 12 },
-  searchResultName: { color: '#fff', fontWeight: '600', fontSize: 14 },
-  searchResultBrand: { color: '#e94560', fontSize: 12, marginTop: 2 },
-  searchResultMacros: { color: '#8892b0', fontSize: 11, marginTop: 3 },
-  searchEmpty: { color: '#8892b0', textAlign: 'center', marginTop: 40, fontSize: 15 },
+  searchResultName: { color: '#FFF5E8', fontWeight: '600', fontSize: 14 },
+  searchResultBrand: { color: '#E8291C', fontSize: 12, marginTop: 2 },
+  searchResultMacros: { color: '#C4956A', fontSize: 11, marginTop: 3 },
+  searchEmpty: { color: '#C4956A', textAlign: 'center', marginTop: 40, fontSize: 15 },
 });

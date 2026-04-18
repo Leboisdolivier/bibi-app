@@ -53,14 +53,19 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Text style={styles.title}>Bibis App</Text>
+      {/* Logo BIBIS */}
+      <View style={styles.logoBox}>
+        <Text style={styles.logoText}>BIBIS</Text>
+        <Text style={styles.logoSub}>MUSCLE BEACH · VENICE</Text>
+      </View>
+
       <Text style={styles.subtitle}>
         {isSignUp ? 'Créer un compte' : 'Connectez-vous'}
       </Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor="#8892b0"
+        placeholderTextColor="#7A5540"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -70,7 +75,7 @@ export default function LoginScreen() {
       <TextInput
         style={styles.input}
         placeholder="Mot de passe (min. 6 caractères)"
-        placeholderTextColor="#8892b0"
+        placeholderTextColor="#7A5540"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -81,7 +86,7 @@ export default function LoginScreen() {
         disabled={loading}
       >
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color="#FFF5E8" />
         ) : (
           <Text style={styles.buttonText}>
             {isSignUp ? 'Créer mon compte' : 'Se connecter'}
@@ -108,30 +113,32 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f23',
+    backgroundColor: '#100800',
     justifyContent: 'center',
     padding: 24,
   },
-  title: { fontSize: 32, fontWeight: 'bold', color: '#e94560', textAlign: 'center', marginBottom: 8 },
-  subtitle: { fontSize: 16, color: '#8892b0', textAlign: 'center', marginBottom: 32 },
+  logoBox: { alignItems: 'center', marginBottom: 32 },
+  logoText: { fontSize: 52, fontWeight: '900', color: '#E8291C', letterSpacing: -1 },
+  logoSub: { fontSize: 11, color: '#C4956A', letterSpacing: 3, textTransform: 'uppercase', marginTop: 4 },
+  subtitle: { fontSize: 16, color: '#C4956A', textAlign: 'center', marginBottom: 24 },
   input: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#1E1008',
     borderRadius: 12,
     padding: 16,
-    color: '#fff',
+    color: '#FFF5E8',
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#16213e',
+    borderColor: '#3D2015',
   },
   button: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#E8291C',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 8,
   },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  buttonText: { color: '#FFF5E8', fontWeight: '700', fontSize: 16 },
   switch: { marginTop: 24, alignItems: 'center' },
-  switchText: { color: '#e94560', fontSize: 14 },
-  hint: { marginTop: 32, color: '#8892b0', fontSize: 12, textAlign: 'center' },
+  switchText: { color: '#E8291C', fontSize: 14 },
+  hint: { marginTop: 32, color: '#7A5540', fontSize: 12, textAlign: 'center' },
 });

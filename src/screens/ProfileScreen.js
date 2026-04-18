@@ -188,7 +188,7 @@ function NumberField({ label, unit, value, onChange, editing }) {
           keyboardType="numeric"
           editable={editing}
           placeholder="—"
-          placeholderTextColor="#8892b0"
+          placeholderTextColor="#7A5540"
         />
         <Text style={styles.numberUnit}>{unit}</Text>
       </View>
@@ -209,64 +209,64 @@ function MacroTarget({ label, value, unit, color, pct }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f23' },
+  container: { flex: 1, backgroundColor: '#100800' },
   content: { padding: 20, paddingBottom: 50 },
 
   pageHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 },
-  pageTitle: { fontSize: 26, fontWeight: '800', color: '#fff' },
-  email: { fontSize: 13, color: '#8892b0', marginTop: 4 },
-  editBtn: { backgroundColor: '#1a1a2e', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: '#e94560' },
-  editBtnText: { color: '#e94560', fontWeight: '600', fontSize: 14 },
+  pageTitle: { fontSize: 26, fontWeight: '900', color: '#FFF5E8', letterSpacing: -0.5 },
+  email: { fontSize: 13, color: '#C4956A', marginTop: 4 },
+  editBtn: { backgroundColor: '#1E1008', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: '#E8291C' },
+  editBtnText: { color: '#E8291C', fontWeight: '600', fontSize: 14 },
   editActions: { flexDirection: 'row', gap: 8 },
-  cancelBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: '#16213e' },
-  cancelBtnText: { color: '#8892b0', fontSize: 13 },
-  saveBtn: { backgroundColor: '#e94560', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
-  saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  cancelBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: '#3D2015' },
+  cancelBtnText: { color: '#C4956A', fontSize: 13 },
+  saveBtn: { backgroundColor: '#E8291C', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
+  saveBtnText: { color: '#FFF5E8', fontWeight: '700', fontSize: 13 },
 
-  card: { backgroundColor: '#1a1a2e', borderRadius: 16, padding: 18, marginBottom: 16, borderWidth: 1, borderColor: '#16213e' },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#e94560', marginBottom: 16 },
+  card: { backgroundColor: '#1E1008', borderRadius: 16, padding: 18, marginBottom: 16, borderWidth: 1, borderColor: '#3D2015' },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: '#E8291C', marginBottom: 16 },
 
   toggleRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  toggleBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#16213e', alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
-  toggleBtnActive: { borderColor: '#e94560', backgroundColor: '#2a0a14' },
-  toggleBtnText: { color: '#8892b0', fontWeight: '600' },
-  toggleBtnTextActive: { color: '#e94560' },
+  toggleBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#2C1810', alignItems: 'center', borderWidth: 1, borderColor: '#3D2015' },
+  toggleBtnActive: { borderColor: '#E8291C', backgroundColor: '#2C1810' },
+  toggleBtnText: { color: '#C4956A', fontWeight: '600' },
+  toggleBtnTextActive: { color: '#E8291C' },
 
   fieldsRow: { flexDirection: 'row', gap: 10 },
   numberField: { flex: 1 },
-  fieldLabel: { color: '#8892b0', fontSize: 12, marginBottom: 6 },
+  fieldLabel: { color: '#C4956A', fontSize: 12, marginBottom: 6 },
   numberRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  numberInput: { flex: 1, backgroundColor: '#16213e', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 10, color: '#fff', fontSize: 16, fontWeight: '700', textAlign: 'center', borderWidth: 1, borderColor: '#16213e' },
+  numberInput: { flex: 1, backgroundColor: '#2C1810', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 10, color: '#FFF5E8', fontSize: 16, fontWeight: '700', textAlign: 'center', borderWidth: 1, borderColor: '#3D2015' },
   numberInputDisabled: { opacity: 0.7 },
-  numberUnit: { color: '#8892b0', fontSize: 12 },
+  numberUnit: { color: '#C4956A', fontSize: 12 },
 
   optionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 10, borderRadius: 10, marginBottom: 4, borderWidth: 1, borderColor: 'transparent' },
-  optionRowActive: { backgroundColor: '#2a0a14', borderColor: '#e94560' },
+  optionRowActive: { backgroundColor: '#2C1810', borderColor: '#E8291C' },
   optionInfo: { flex: 1 },
-  optionLabel: { color: '#fff', fontWeight: '600', fontSize: 14 },
-  optionLabelActive: { color: '#e94560' },
-  optionDesc: { color: '#8892b0', fontSize: 12, marginTop: 2 },
-  optionCheck: { color: '#e94560', fontSize: 16, fontWeight: '700' },
+  optionLabel: { color: '#FFF5E8', fontWeight: '600', fontSize: 14 },
+  optionLabelActive: { color: '#E8291C' },
+  optionDesc: { color: '#C4956A', fontSize: 12, marginTop: 2 },
+  optionCheck: { color: '#E8291C', fontSize: 16, fontWeight: '700' },
 
   metaRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
-  metaBox: { flex: 1, backgroundColor: '#16213e', borderRadius: 12, padding: 12, alignItems: 'center' },
-  metaBoxLabel: { color: '#8892b0', fontSize: 11, textAlign: 'center', marginBottom: 4 },
-  metaBoxValue: { color: '#fff', fontWeight: '800', fontSize: 16 },
-  metaBoxSub: { color: '#8892b0', fontSize: 10, marginTop: 2, textAlign: 'center' },
+  metaBox: { flex: 1, backgroundColor: '#2C1810', borderRadius: 12, padding: 12, alignItems: 'center' },
+  metaBoxLabel: { color: '#C4956A', fontSize: 11, textAlign: 'center', marginBottom: 4 },
+  metaBoxValue: { color: '#FFF5E8', fontWeight: '800', fontSize: 16 },
+  metaBoxSub: { color: '#C4956A', fontSize: 10, marginTop: 2, textAlign: 'center' },
 
-  targetBox: { backgroundColor: '#2a0a14', borderRadius: 14, padding: 16, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: '#e94560' },
-  targetLabel: { color: '#8892b0', fontSize: 13, marginBottom: 4 },
-  targetValue: { fontSize: 36, fontWeight: '800', color: '#e94560' },
-  targetSub: { color: '#8892b0', fontSize: 12, marginTop: 4, textAlign: 'center' },
+  targetBox: { backgroundColor: '#2C1810', borderRadius: 14, padding: 16, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: '#E8291C' },
+  targetLabel: { color: '#C4956A', fontSize: 13, marginBottom: 4 },
+  targetValue: { fontSize: 36, fontWeight: '900', color: '#E8291C' },
+  targetSub: { color: '#C4956A', fontSize: 12, marginTop: 4, textAlign: 'center' },
 
-  macrosTitle: { color: '#8892b0', fontSize: 12, fontWeight: '600', textTransform: 'uppercase', marginBottom: 10 },
+  macrosTitle: { color: '#C4956A', fontSize: 12, fontWeight: '600', textTransform: 'uppercase', marginBottom: 10 },
   macrosRow: { flexDirection: 'row', justifyContent: 'space-around' },
   macroTarget: { alignItems: 'center' },
   macroTargetValue: { fontSize: 22, fontWeight: '800' },
   macroTargetUnit: { fontSize: 13, fontWeight: '600' },
-  macroTargetLabel: { color: '#fff', fontSize: 12, marginTop: 4 },
-  macroTargetSub: { color: '#8892b0', fontSize: 10, marginTop: 2 },
+  macroTargetLabel: { color: '#FFF5E8', fontSize: 12, marginTop: 4 },
+  macroTargetSub: { color: '#C4956A', fontSize: 10, marginTop: 2 },
 
-  signOutBtn: { marginTop: 12, padding: 16, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: '#e94560' },
-  signOutText: { color: '#e94560', fontWeight: '600' },
+  signOutBtn: { marginTop: 12, padding: 16, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: '#E8291C' },
+  signOutText: { color: '#E8291C', fontWeight: '600' },
 });

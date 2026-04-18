@@ -188,7 +188,7 @@ export default function ActiveWorkout({ template, onFinish, onCancel }) {
           value={workoutName}
           onChangeText={setWorkoutName}
           placeholder="Nom de la séance"
-          placeholderTextColor="#8892b0"
+          placeholderTextColor="#7A5540"
         />
 
         {/* Stats rapides */}
@@ -293,7 +293,7 @@ function SetRow({ set, index, exIdx, onToggle, onUpdate, onRemove, isLast }) {
         value={set.weight}
         onChangeText={v => onUpdate(exIdx, index, 'weight', v)}
         placeholder="—"
-        placeholderTextColor="#8892b0"
+        placeholderTextColor="#7A5540"
         keyboardType="decimal-pad"
         editable={!set.done}
       />
@@ -302,7 +302,7 @@ function SetRow({ set, index, exIdx, onToggle, onUpdate, onRemove, isLast }) {
         value={set.reps}
         onChangeText={v => onUpdate(exIdx, index, 'reps', v)}
         placeholder="10"
-        placeholderTextColor="#8892b0"
+        placeholderTextColor="#7A5540"
         keyboardType="number-pad"
         editable={!set.done}
       />
@@ -356,73 +356,73 @@ function buildExercises(template) {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f23' },
+  root: { flex: 1, backgroundColor: '#100800' },
 
   // Header
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 52, paddingBottom: 12, backgroundColor: '#1a1a2e', borderBottomWidth: 1, borderBottomColor: '#16213e' },
-  cancelBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
-  cancelText: { color: '#8892b0', fontSize: 16, fontWeight: '700' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 52, paddingBottom: 12, backgroundColor: '#1E1008', borderBottomWidth: 1, borderBottomColor: '#3D2015' },
+  cancelBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
+  cancelText: { color: '#C4956A', fontSize: 16, fontWeight: '700' },
   headerCenter: { alignItems: 'center' },
-  timerText: { fontSize: 22, fontWeight: '800', color: '#e94560', fontVariant: ['tabular-nums'] },
-  headerSub: { color: '#8892b0', fontSize: 12, marginTop: 2 },
-  finishBtn: { backgroundColor: '#e94560', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
-  finishText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  timerText: { fontSize: 22, fontWeight: '800', color: '#E8291C', fontVariant: ['tabular-nums'] },
+  headerSub: { color: '#C4956A', fontSize: 12, marginTop: 2 },
+  finishBtn: { backgroundColor: '#E8291C', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
+  finishText: { color: '#FFF5E8', fontWeight: '700', fontSize: 14 },
 
   // Bannière repos
-  restBanner: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#0f3460', paddingHorizontal: 16, paddingVertical: 12 },
+  restBanner: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#1855CC', paddingHorizontal: 16, paddingVertical: 12 },
   restEmoji: { fontSize: 22 },
-  restTime: { fontSize: 20, fontWeight: '800', color: '#fff', fontVariant: ['tabular-nums'] },
-  restHint: { color: '#8892b0', fontSize: 11, marginTop: 1 },
+  restTime: { fontSize: 20, fontWeight: '800', color: '#FFF5E8', fontVariant: ['tabular-nums'] },
+  restHint: { color: 'rgba(255,245,232,0.7)', fontSize: 11, marginTop: 1 },
   restPresetsInline: { flex: 1, flexDirection: 'row', justifyContent: 'flex-end', gap: 6 },
-  restPresetChip: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, backgroundColor: '#16213e' },
-  restPresetText: { color: '#8892b0', fontSize: 11, fontWeight: '600' },
+  restPresetChip: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)' },
+  restPresetText: { color: '#FFF5E8', fontSize: 11, fontWeight: '600' },
 
   content: { padding: 16, paddingBottom: 60 },
 
-  workoutNameInput: { fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 14, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: '#16213e' },
+  workoutNameInput: { fontSize: 22, fontWeight: '800', color: '#FFF5E8', marginBottom: 14, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: '#3D2015' },
 
   // Stats
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  statPill: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 12, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
-  statValue: { color: '#e94560', fontWeight: '800', fontSize: 16 },
-  statLabel: { color: '#8892b0', fontSize: 11, marginTop: 3 },
+  statPill: { flex: 1, backgroundColor: '#1E1008', borderRadius: 12, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: '#3D2015' },
+  statValue: { color: '#E8291C', fontWeight: '800', fontSize: 16 },
+  statLabel: { color: '#C4956A', fontSize: 11, marginTop: 3 },
 
   // Bloc exercice
-  exBlock: { backgroundColor: '#1a1a2e', borderRadius: 14, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#16213e' },
+  exBlock: { backgroundColor: '#1E1008', borderRadius: 14, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#3D2015' },
   exHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  exName: { color: '#fff', fontWeight: '700', fontSize: 16, flex: 1 },
+  exName: { color: '#FFF5E8', fontWeight: '700', fontSize: 16, flex: 1 },
   exHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  exProgress: { color: '#e94560', fontSize: 13, fontWeight: '600' },
+  exProgress: { color: '#E8291C', fontSize: 13, fontWeight: '600' },
   exRemoveBtn: { padding: 4 },
   exRemoveText: { fontSize: 16 },
 
   setHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4, paddingHorizontal: 2 },
-  setHeaderCell: { color: '#8892b0', fontSize: 11, textAlign: 'center', textTransform: 'uppercase', letterSpacing: 0.4 },
+  setHeaderCell: { color: '#C4956A', fontSize: 11, textAlign: 'center', textTransform: 'uppercase', letterSpacing: 0.4 },
 
   // Ligne série
   setRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, gap: 6 },
   setRowDone: { opacity: 0.6 },
-  setNumber: { width: 32, color: '#8892b0', fontSize: 13, textAlign: 'center', fontWeight: '600' },
-  setNumberDone: { color: '#4ecdc4' },
-  setInput: { flex: 1, backgroundColor: '#16213e', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 9, color: '#fff', fontSize: 15, textAlign: 'center', fontWeight: '600' },
-  setInputDone: { backgroundColor: '#0d2a1f' },
-  checkBtn: { width: 52, height: 36, borderRadius: 8, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
-  checkBtnDone: { backgroundColor: '#4ecdc4' },
-  checkBtnText: { color: '#8892b0', fontSize: 18 },
-  checkBtnTextDone: { color: '#fff', fontWeight: '700' },
+  setNumber: { width: 32, color: '#C4956A', fontSize: 13, textAlign: 'center', fontWeight: '600' },
+  setNumberDone: { color: '#4ECDC4' },
+  setInput: { flex: 1, backgroundColor: '#2C1810', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 9, color: '#FFF5E8', fontSize: 15, textAlign: 'center', fontWeight: '600' },
+  setInputDone: { backgroundColor: '#1E2A20' },
+  checkBtn: { width: 52, height: 36, borderRadius: 8, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
+  checkBtnDone: { backgroundColor: '#4ECDC4' },
+  checkBtnText: { color: '#C4956A', fontSize: 18 },
+  checkBtnTextDone: { color: '#100800', fontWeight: '700' },
 
-  addSetBtn: { marginTop: 10, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: '#16213e', alignItems: 'center' },
-  addSetText: { color: '#8892b0', fontSize: 13, fontWeight: '600' },
+  addSetBtn: { marginTop: 10, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: '#3D2015', alignItems: 'center' },
+  addSetText: { color: '#C4956A', fontSize: 13, fontWeight: '600' },
 
-  addExBtn: { backgroundColor: '#1a1a2e', borderRadius: 14, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#16213e', marginBottom: 20 },
-  addExText: { color: '#e94560', fontWeight: '700', fontSize: 15 },
+  addExBtn: { backgroundColor: '#1E1008', borderRadius: 14, paddingVertical: 18, alignItems: 'center', borderWidth: 1, borderColor: '#3D2015', marginBottom: 20 },
+  addExText: { color: '#E8291C', fontWeight: '700', fontSize: 15 },
 
   // Config repos
-  restConfig: { backgroundColor: '#1a1a2e', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#16213e' },
-  restConfigLabel: { color: '#8892b0', fontSize: 13, marginBottom: 10 },
+  restConfig: { backgroundColor: '#1E1008', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#3D2015' },
+  restConfigLabel: { color: '#C4956A', fontSize: 13, marginBottom: 10 },
   restPresetRow: { flexDirection: 'row', gap: 8 },
-  presetChip: { flex: 1, paddingVertical: 8, borderRadius: 20, backgroundColor: '#16213e', alignItems: 'center' },
-  presetChipActive: { backgroundColor: '#e94560' },
-  presetText: { color: '#8892b0', fontSize: 13, fontWeight: '600' },
-  presetTextActive: { color: '#fff' },
+  presetChip: { flex: 1, paddingVertical: 8, borderRadius: 20, backgroundColor: '#2C1810', alignItems: 'center' },
+  presetChipActive: { backgroundColor: '#E8291C' },
+  presetText: { color: '#C4956A', fontSize: 13, fontWeight: '600' },
+  presetTextActive: { color: '#FFF5E8' },
 });

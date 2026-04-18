@@ -1,46 +1,31 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, FlatList,
 } from 'react-native';
 import ActiveWorkout from '../components/ActiveWorkout';
 import { PROGRAMS, getExercise } from '../services/exerciseDB';
-
-const DEMO_HISTORY = [
-  {
-    id: 'h1',
-    name: 'Push',
-    date: new Date(Date.now() - 86400000).toISOString(),
-    duration: 2640,
-    exercises: [
-      { name: 'Développé couché',   sets: [{ weight: '80', reps: '8' }, { weight: '80', reps: '8' }, { weight: '80', reps: '7' }] },
-      { name: 'Développé incliné',  sets: [{ weight: '60', reps: '10' }, { weight: '60', reps: '9' }] },
-      { name: 'Développé militaire',sets: [{ weight: '50', reps: '10' }, { weight: '50', reps: '8' }] },
-    ],
-  },
-  {
-    id: 'h2',
-    name: 'Pull',
-    date: new Date(Date.now() - 2 * 86400000).toISOString(),
-    duration: 2280,
-    exercises: [
-      { name: 'Soulevé de terre',   sets: [{ weight: '100', reps: '6' }, { weight: '100', reps: '6' }] },
-      { name: 'Tirage nuque poulie',sets: [{ weight: '70', reps: '10' }, { weight: '70', reps: '10' }] },
-      { name: 'Curl barre',         sets: [{ weight: '35', reps: '10' }, { weight: '35', reps: '9' }] },
-    ],
-  },
-];
+import { loadWorkouts, saveWorkouts } from '../services/storage';
 
 export default function WorkoutScreen() {
-  const [history, setHistory]       = useState(DEMO_HISTORY);
+  const [history, setHistory]       = useState([]);
   const [activeWorkout, setActive]  = useState(null); // null | { template }
+
+  // Charge l'historique depuis AsyncStorage au démarrage
+  useEffect(() => {
+    loadWorkouts().then(saved => { if (saved && saved.length) setHistory(saved); });
+  }, []);
 
   const handleStart = useCallback((template = null) => {
     setActive({ template });
   }, []);
 
   const handleFinish = useCallback((result) => {
-    setHistory(prev => [result, ...prev]);
+    setHistory(prev => {
+      const next = [result, ...prev];
+      saveWorkouts(next);
+      return next;
+    });
     setActive(null);
   }, []);
 
@@ -147,7 +132,7 @@ function HistoryCard({ workout }) {
       <View style={styles.historyMeta}>
         <MetaChip label={`${workout.exercises.length} exercices`} />
         <MetaChip label={`${sets} séries`} />
-        {vol > 0 && <MetaChip label={`${Math.round(vol).toLocaleString('fr')} kg`} color="#4ecdc4" />}
+        {vol > 0 && <MetaChip label={`${Math.round(vol).toLocaleString('fr')} kg`} color="#4ECDC4" />}
       </View>
 
       {expanded && (
@@ -180,7 +165,7 @@ function StatCard({ label, value, icon }) {
   );
 }
 
-function MetaChip({ label, color = '#8892b0' }) {
+function MetaChip({ label, color = '#C4956A' }) {
   return <Text style={[styles.metaChip, { color }]}>{label}</Text>;
 }
 
@@ -212,58 +197,58 @@ function formatDate(iso) {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f23' },
+  container: { flex: 1, backgroundColor: '#100800' },
   content: { padding: 20, paddingBottom: 40 },
 
-  pageTitle: { fontSize: 26, fontWeight: '800', color: '#fff', marginBottom: 18 },
+  pageTitle: { fontSize: 26, fontWeight: '900', color: '#FFF5E8', marginBottom: 18, letterSpacing: -0.5 },
 
   startBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
-    backgroundColor: '#e94560', borderRadius: 16, padding: 18, marginBottom: 20,
+    backgroundColor: '#E8291C', borderRadius: 12, padding: 18, marginBottom: 20,
   },
   startBtnIcon: { fontSize: 28 },
-  startBtnTitle: { color: '#fff', fontWeight: '800', fontSize: 16 },
-  startBtnSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
-  startArrow: { color: '#fff', fontSize: 24, marginLeft: 'auto' },
+  startBtnTitle: { color: '#FFF5E8', fontWeight: '800', fontSize: 16 },
+  startBtnSub: { color: 'rgba(255,245,232,0.7)', fontSize: 12, marginTop: 2 },
+  startArrow: { color: '#FFF5E8', fontSize: 24, marginLeft: 'auto' },
 
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 24 },
-  statCard: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 14, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
+  statCard: { flex: 1, backgroundColor: '#1E1008', borderRadius: 14, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: '#3D2015' },
   statIcon: { fontSize: 20, marginBottom: 6 },
-  statValue: { color: '#e94560', fontWeight: '800', fontSize: 15 },
-  statLabel: { color: '#8892b0', fontSize: 10, textAlign: 'center', marginTop: 3 },
+  statValue: { color: '#E8291C', fontWeight: '800', fontSize: 15 },
+  statLabel: { color: '#C4956A', fontSize: 10, textAlign: 'center', marginTop: 3 },
 
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#FFF5E8', marginBottom: 12 },
 
   programList: { paddingBottom: 4, gap: 12 },
   programCard: {
-    backgroundColor: '#1a1a2e', borderRadius: 14, padding: 16, width: 140,
-    borderWidth: 1, borderColor: '#16213e', marginRight: 12,
+    backgroundColor: '#1E1008', borderRadius: 14, padding: 16, width: 140,
+    borderWidth: 1, borderColor: '#3D2015', marginRight: 12,
   },
   programEmoji: { fontSize: 28, marginBottom: 8 },
-  programName: { color: '#fff', fontWeight: '800', fontSize: 16 },
-  programDesc: { color: '#8892b0', fontSize: 11, marginTop: 4, lineHeight: 16 },
-  programCount: { color: '#e94560', fontSize: 11, marginTop: 8, fontWeight: '600' },
+  programName: { color: '#FFF5E8', fontWeight: '800', fontSize: 16 },
+  programDesc: { color: '#C4956A', fontSize: 11, marginTop: 4, lineHeight: 16 },
+  programCount: { color: '#E8291C', fontSize: 11, marginTop: 8, fontWeight: '600' },
 
   historyCard: {
-    backgroundColor: '#1a1a2e', borderRadius: 14, padding: 16,
-    marginBottom: 12, borderWidth: 1, borderColor: '#16213e',
+    backgroundColor: '#1E1008', borderRadius: 14, padding: 16,
+    marginBottom: 12, borderWidth: 1, borderColor: '#3D2015',
   },
   historyHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   historyLeft: {},
-  historyName: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  historyDate: { color: '#8892b0', fontSize: 12, marginTop: 2 },
+  historyName: { color: '#FFF5E8', fontWeight: '700', fontSize: 16 },
+  historyDate: { color: '#C4956A', fontSize: 12, marginTop: 2 },
   historyRight: { alignItems: 'flex-end', gap: 4 },
-  historyDuration: { color: '#e94560', fontWeight: '600', fontSize: 14 },
-  historyExpand: { color: '#8892b0', fontSize: 12 },
+  historyDuration: { color: '#E8291C', fontWeight: '600', fontSize: 14 },
+  historyExpand: { color: '#C4956A', fontSize: 12 },
   historyMeta: { flexDirection: 'row', gap: 10, marginTop: 10, flexWrap: 'wrap' },
   metaChip: { fontSize: 12, fontWeight: '500' },
-  historyDetail: { marginTop: 12, borderTopWidth: 1, borderTopColor: '#16213e', paddingTop: 12, gap: 8 },
+  historyDetail: { marginTop: 12, borderTopWidth: 1, borderTopColor: '#3D2015', paddingTop: 12, gap: 8 },
   historyExRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  historyExName: { color: '#fff', fontSize: 13 },
-  historyExSets: { color: '#8892b0', fontSize: 12 },
+  historyExName: { color: '#FFF5E8', fontSize: 13 },
+  historyExSets: { color: '#C4956A', fontSize: 12 },
 
   emptyState: { alignItems: 'center', paddingVertical: 40 },
   emptyEmoji: { fontSize: 48, marginBottom: 14 },
-  emptyText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  emptyHint: { color: '#8892b0', fontSize: 13, marginTop: 6 },
+  emptyText: { color: '#FFF5E8', fontSize: 16, fontWeight: '600' },
+  emptyHint: { color: '#C4956A', fontSize: 13, marginTop: 6 },
 });

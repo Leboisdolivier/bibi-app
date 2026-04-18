@@ -57,7 +57,7 @@ export default function BarcodeScanner({ onProductFound, onClose }) {
   if (!permission) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator color="#e94560" size="large" />
+        <ActivityIndicator color="#E8291C" size="large" />
       </View>
     );
   }
@@ -119,7 +119,7 @@ export default function BarcodeScanner({ onProductFound, onClose }) {
       <View style={styles.footer}>
         {loading ? (
           <View style={styles.statusRow}>
-            <ActivityIndicator color="#e94560" size="small" />
+            <ActivityIndicator color="#E8291C" size="small" />
             <Text style={styles.statusText}>  Recherche du produit…</Text>
           </View>
         ) : error ? (
@@ -137,12 +137,12 @@ const BORDER = 3;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  center: { flex: 1, backgroundColor: '#0f0f23', alignItems: 'center', justifyContent: 'center', padding: 24 },
-  permText: { color: '#fff', fontSize: 16, textAlign: 'center', marginBottom: 24 },
-  btn: { backgroundColor: '#e94560', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginBottom: 12 },
-  btnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  center: { flex: 1, backgroundColor: '#100800', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  permText: { color: '#FFF5E8', fontSize: 16, textAlign: 'center', marginBottom: 24 },
+  btn: { backgroundColor: '#E8291C', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginBottom: 12 },
+  btnText: { color: '#FFF5E8', fontWeight: '700', fontSize: 16 },
   btnGhost: { paddingVertical: 12 },
-  btnGhostText: { color: '#8892b0', fontSize: 14 },
+  btnGhostText: { color: '#C4956A', fontSize: 14 },
 
   // Overlay
   overlay: { ...StyleSheet.absoluteFillObject },
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: CORNER,
     height: CORNER,
-    borderColor: '#e94560',
+    borderColor: '#E8291C',
   },
   cornerTL: { top: 0, left: 0, borderTopWidth: BORDER, borderLeftWidth: BORDER, borderTopLeftRadius: 4 },
   cornerTR: { top: 0, right: 0, borderTopWidth: BORDER, borderRightWidth: BORDER, borderTopRightRadius: 4 },
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     height: 2,
-    backgroundColor: '#e94560',
+    backgroundColor: '#E8291C',
     opacity: 0.8,
   },
 
@@ -198,8 +198,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeBtnText: { color: '#fff', fontSize: 18, fontWeight: '700' },
-  title: { color: '#fff', fontSize: 17, fontWeight: '700' },
+  closeBtnText: { color: '#FFF5E8', fontSize: 18, fontWeight: '700' },
+  title: { color: '#FFF5E8', fontSize: 17, fontWeight: '700' },
 
   // Footer
   footer: {
@@ -210,8 +210,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 32,
   },
-  hint: { color: 'rgba(255,255,255,0.75)', fontSize: 14, textAlign: 'center' },
+  hint: { color: 'rgba(255,245,232,0.75)', fontSize: 14, textAlign: 'center' },
   statusRow: { flexDirection: 'row', alignItems: 'center' },
-  statusText: { color: '#fff', fontSize: 14 },
-  errorText: { color: '#e94560', fontSize: 14, textAlign: 'center', lineHeight: 22 },
+  statusText: { color: '#FFF5E8', fontSize: 14 },
+  errorText: { color: '#E8291C', fontSize: 14, textAlign: 'center', lineHeight: 22 },
 });

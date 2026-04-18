@@ -51,7 +51,7 @@ export default function ExercisePicker({ visible, onSelect, onClose }) {
           <TextInput
             style={styles.searchInput}
             placeholder="Rechercher un exercice…"
-            placeholderTextColor="#8892b0"
+            placeholderTextColor="#C4956A"
             value={query}
             onChangeText={handleSearch}
             returnKeyType="search"
@@ -137,37 +137,37 @@ export default function ExercisePicker({ visible, onSelect, onClose }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f23', padding: 20 },
+  container: { flex: 1, backgroundColor: '#100800', padding: 20 },
 
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingTop: 8 },
-  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
-  closeBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  title: { fontSize: 17, fontWeight: '700', color: '#fff' },
+  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { color: '#FFF5E8', fontSize: 16, fontWeight: '700' },
+  title: { fontSize: 17, fontWeight: '700', color: '#FFF5E8' },
 
-  searchRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1a2e', borderRadius: 12, paddingHorizontal: 14, marginBottom: 14, borderWidth: 1, borderColor: '#16213e' },
+  searchRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E1008', borderRadius: 12, paddingHorizontal: 14, marginBottom: 14, borderWidth: 1, borderColor: '#3D2015' },
   searchIcon: { fontSize: 15, marginRight: 8 },
-  searchInput: { flex: 1, color: '#fff', fontSize: 15, paddingVertical: 13 },
-  clearText: { color: '#8892b0', fontSize: 14, padding: 4 },
+  searchInput: { flex: 1, color: '#FFF5E8', fontSize: 15, paddingVertical: 13 },
+  clearText: { color: '#C4956A', fontSize: 14, padding: 4 },
 
   muscleChips: { paddingBottom: 12, gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#16213e', marginRight: 8 },
-  chipActive: { borderColor: '#e94560', backgroundColor: '#1a1a2e' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#1E1008', borderWidth: 1, borderColor: '#3D2015', marginRight: 8 },
+  chipActive: { borderColor: '#E8291C', backgroundColor: '#1E1008' },
   chipEmoji: { fontSize: 14 },
-  chipLabel: { color: '#8892b0', fontSize: 13, fontWeight: '500' },
-  chipLabelActive: { color: '#e94560' },
+  chipLabel: { color: '#C4956A', fontSize: 13, fontWeight: '500' },
+  chipLabelActive: { color: '#E8291C' },
 
-  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 4, borderBottomWidth: 1, borderBottomColor: '#16213e' },
+  exerciseRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 4, borderBottomWidth: 1, borderBottomColor: '#3D2015' },
   exerciseInfo: { flex: 1 },
-  exerciseName: { color: '#fff', fontSize: 15, fontWeight: '600' },
-  exerciseMeta: { color: '#8892b0', fontSize: 12, marginTop: 2 },
-  exerciseAdd: { color: '#e94560', fontSize: 26, fontWeight: '300', paddingHorizontal: 8 },
+  exerciseName: { color: '#FFF5E8', fontSize: 15, fontWeight: '600' },
+  exerciseMeta: { color: '#C4956A', fontSize: 12, marginTop: 2 },
+  exerciseAdd: { color: '#E8291C', fontSize: 26, fontWeight: '300', paddingHorizontal: 8 },
 
-  empty: { color: '#8892b0', textAlign: 'center', marginTop: 40 },
+  empty: { color: '#C4956A', textAlign: 'center', marginTop: 40 },
 
   grid: { paddingBottom: 40 },
   gridRow: { gap: 12, marginBottom: 12 },
-  gridCard: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 14, padding: 18, alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
+  gridCard: { flex: 1, backgroundColor: '#1E1008', borderRadius: 14, padding: 18, alignItems: 'center', borderWidth: 1, borderColor: '#3D2015' },
   gridEmoji: { fontSize: 28, marginBottom: 8 },
-  gridLabel: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  gridCount: { color: '#8892b0', fontSize: 11, marginTop: 4 },
+  gridLabel: { color: '#FFF5E8', fontWeight: '700', fontSize: 14 },
+  gridCount: { color: '#C4956A', fontSize: 11, marginTop: 4 },
 });

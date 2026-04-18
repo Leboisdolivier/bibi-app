@@ -88,10 +88,10 @@ export default function ProductModal({ product, visible, onAdd, onClose }) {
           <Text style={styles.sectionLabel}>Valeurs nutritionnelles pour 100g</Text>
           <View style={styles.per100Row}>
             {[
-              { label: 'Kcal',     value: product.per100.calories, color: '#e94560' },
-              { label: 'Prot.',    value: `${product.per100.protein}g`, color: '#4ecdc4' },
-              { label: 'Glucides', value: `${product.per100.carbs}g`,   color: '#f7b731' },
-              { label: 'Lipides',  value: `${product.per100.fat}g`,     color: '#a29bfe' },
+              { label: 'Kcal',     value: product.per100.calories, color: '#E8291C' },
+              { label: 'Prot.',    value: `${product.per100.protein}g`, color: '#4ECDC4' },
+              { label: 'Glucides', value: `${product.per100.carbs}g`,   color: '#F59E0B' },
+              { label: 'Lipides',  value: `${product.per100.fat}g`,     color: '#A78BFA' },
             ].map(({ label, value, color }) => (
               <View key={label} style={styles.per100Item}>
                 <Text style={[styles.per100Value, { color }]}>{value}</Text>
@@ -122,7 +122,7 @@ export default function ProductModal({ product, visible, onAdd, onClose }) {
               onChangeText={setGrams}
               keyboardType="numeric"
               placeholder="Quantité"
-              placeholderTextColor="#8892b0"
+              placeholderTextColor="#C4956A"
               selectTextOnFocus
             />
             <Text style={styles.inputUnit}>grammes</Text>
@@ -137,9 +137,9 @@ export default function ProductModal({ product, visible, onAdd, onClose }) {
                 <Text style={styles.summaryKcal}>kcal</Text>
               </View>
               <View style={styles.summaryDetails}>
-                <MacroLine label="Protéines" value={nutrition.protein} unit="g" color="#4ecdc4" />
-                <MacroLine label="Glucides"  value={nutrition.carbs}   unit="g" color="#f7b731" />
-                <MacroLine label="Lipides"   value={nutrition.fat}     unit="g" color="#a29bfe" />
+                <MacroLine label="Protéines" value={nutrition.protein} unit="g" color="#4ECDC4" />
+                <MacroLine label="Glucides"  value={nutrition.carbs}   unit="g" color="#F59E0B" />
+                <MacroLine label="Lipides"   value={nutrition.fat}     unit="g" color="#A78BFA" />
               </View>
             </View>
           </View>
@@ -186,58 +186,58 @@ function MacroLine({ label, value, unit, color }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f23' },
+  container: { flex: 1, backgroundColor: '#100800' },
   content: { padding: 20, paddingBottom: 40 },
 
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, paddingTop: 8 },
-  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
-  closeBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#fff' },
+  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { color: '#FFF5E8', fontSize: 16, fontWeight: '700' },
+  headerTitle: { fontSize: 17, fontWeight: '700', color: '#FFF5E8' },
 
-  productRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 24, backgroundColor: '#1a1a2e', borderRadius: 14, padding: 14 },
-  productImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#16213e' },
-  productImagePlaceholder: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
+  productRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 24, backgroundColor: '#1E1008', borderRadius: 14, padding: 14 },
+  productImage: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#2C1810' },
+  productImagePlaceholder: { width: 72, height: 72, borderRadius: 10, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
   productInfo: { flex: 1, marginLeft: 14 },
-  productName: { color: '#fff', fontWeight: '700', fontSize: 15, lineHeight: 20 },
-  productBrand: { color: '#e94560', fontSize: 12, marginTop: 4 },
-  productQty: { color: '#8892b0', fontSize: 11, marginTop: 2 },
+  productName: { color: '#FFF5E8', fontWeight: '700', fontSize: 15, lineHeight: 20 },
+  productBrand: { color: '#E8291C', fontSize: 12, marginTop: 4 },
+  productQty: { color: '#C4956A', fontSize: 11, marginTop: 2 },
 
-  sectionLabel: { color: '#8892b0', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10, marginTop: 20 },
+  sectionLabel: { color: '#C4956A', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10, marginTop: 20 },
 
-  per100Row: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1a1a2e', borderRadius: 12, padding: 14 },
+  per100Row: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1E1008', borderRadius: 12, padding: 14 },
   per100Item: { alignItems: 'center' },
   per100Value: { fontSize: 16, fontWeight: '700' },
-  per100Label: { color: '#8892b0', fontSize: 11, marginTop: 2 },
+  per100Label: { color: '#C4956A', fontSize: 11, marginTop: 2 },
 
   qtyRow: { flexDirection: 'row', gap: 8, marginBottom: 12, flexWrap: 'wrap' },
-  qtyChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#16213e' },
-  qtyChipActive: { backgroundColor: '#e94560', borderColor: '#e94560' },
-  qtyChipText: { color: '#8892b0', fontSize: 14, fontWeight: '600' },
-  qtyChipTextActive: { color: '#fff' },
+  qtyChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#1E1008', borderWidth: 1, borderColor: '#3D2015' },
+  qtyChipActive: { backgroundColor: '#E8291C', borderColor: '#E8291C' },
+  qtyChipText: { color: '#C4956A', fontSize: 14, fontWeight: '600' },
+  qtyChipTextActive: { color: '#FFF5E8' },
 
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  input: { flex: 1, backgroundColor: '#1a1a2e', borderRadius: 10, padding: 14, color: '#fff', fontSize: 18, fontWeight: '600', borderWidth: 1, borderColor: '#16213e', textAlign: 'center' },
-  inputUnit: { color: '#8892b0', fontSize: 16 },
+  input: { flex: 1, backgroundColor: '#1E1008', borderRadius: 10, padding: 14, color: '#FFF5E8', fontSize: 18, fontWeight: '600', borderWidth: 1, borderColor: '#3D2015', textAlign: 'center' },
+  inputUnit: { color: '#C4956A', fontSize: 16 },
 
-  summaryCard: { backgroundColor: '#1a1a2e', borderRadius: 14, padding: 16, marginTop: 16, borderWidth: 1, borderColor: '#16213e' },
-  summaryTitle: { color: '#8892b0', fontSize: 13, marginBottom: 12 },
+  summaryCard: { backgroundColor: '#1E1008', borderRadius: 14, padding: 16, marginTop: 16, borderWidth: 1, borderColor: '#3D2015' },
+  summaryTitle: { color: '#C4956A', fontSize: 13, marginBottom: 12 },
   summaryMacros: { flexDirection: 'row', alignItems: 'center' },
   summaryMain: { alignItems: 'center', marginRight: 24 },
-  summaryCalories: { fontSize: 40, fontWeight: '800', color: '#e94560' },
-  summaryKcal: { color: '#8892b0', fontSize: 12, marginTop: -4 },
+  summaryCalories: { fontSize: 40, fontWeight: '800', color: '#E8291C' },
+  summaryKcal: { color: '#C4956A', fontSize: 12, marginTop: -4 },
   summaryDetails: { flex: 1, gap: 6 },
   macroLine: { flexDirection: 'row', justifyContent: 'space-between' },
-  macroLineLabel: { color: '#8892b0', fontSize: 14 },
+  macroLineLabel: { color: '#C4956A', fontSize: 14 },
   macroLineValue: { fontSize: 14, fontWeight: '600' },
 
   mealTypeRow: { flexDirection: 'row', gap: 10 },
-  mealTypeChip: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#16213e' },
-  mealTypeChipActive: { borderColor: '#e94560', backgroundColor: '#1a1a2e' },
+  mealTypeChip: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: '#1E1008', borderWidth: 1, borderColor: '#3D2015' },
+  mealTypeChipActive: { borderColor: '#E8291C', backgroundColor: '#1E1008' },
   mealTypeEmoji: { fontSize: 20 },
-  mealTypeLabel: { color: '#8892b0', fontSize: 11, marginTop: 4 },
-  mealTypeLabelActive: { color: '#e94560' },
+  mealTypeLabel: { color: '#C4956A', fontSize: 11, marginTop: 4 },
+  mealTypeLabelActive: { color: '#E8291C' },
 
-  addBtn: { backgroundColor: '#e94560', padding: 18, borderRadius: 14, alignItems: 'center', marginTop: 28 },
+  addBtn: { backgroundColor: '#E8291C', padding: 18, borderRadius: 12, alignItems: 'center', marginTop: 28 },
   addBtnDisabled: { opacity: 0.4 },
-  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  addBtnText: { color: '#FFF5E8', fontWeight: '700', fontSize: 16 },
 });

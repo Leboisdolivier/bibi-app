@@ -13,9 +13,9 @@ const MEAL_TYPES = [
 ];
 
 const CONFIDENCE_LABEL = {
-  high:   { label: 'Confiance élevée',  color: '#4ecdc4' },
-  medium: { label: 'Confiance moyenne', color: '#f7b731' },
-  low:    { label: 'Confiance faible',  color: '#e94560' },
+  high:   { label: 'Confiance élevée',  color: '#4ECDC4' },
+  medium: { label: 'Confiance moyenne', color: '#F59E0B' },
+  low:    { label: 'Confiance faible',  color: '#E8291C' },
 };
 
 // Ajouts rapides pour boissons/cafés
@@ -175,17 +175,17 @@ export default function FoodVisionModal({ result, visible, onAdd, onRetry, onClo
             value={mealName}
             onChangeText={setMealName}
             placeholder="Nom du repas"
-            placeholderTextColor="#8892b0"
+            placeholderTextColor="#7A5540"
           />
 
           {/* Totaux recalculés en temps réel */}
           <View style={styles.totalsCard}>
             <Text style={styles.totalsTitle}>Total estimé</Text>
             <View style={styles.totalsRow}>
-              <MacroBox label="Calories" value={totals.calories} unit="kcal" color="#e94560" big />
-              <MacroBox label="Protéines" value={totals.protein} unit="g" color="#4ecdc4" />
-              <MacroBox label="Glucides"  value={totals.carbs}   unit="g" color="#f7b731" />
-              <MacroBox label="Lipides"   value={totals.fat}     unit="g" color="#a29bfe" />
+              <MacroBox label="Calories" value={totals.calories} unit="kcal" color="#E8291C" big />
+              <MacroBox label="Protéines" value={totals.protein} unit="g" color="#4ECDC4" />
+              <MacroBox label="Glucides"  value={totals.carbs}   unit="g" color="#F59E0B" />
+              <MacroBox label="Lipides"   value={totals.fat}     unit="g" color="#A78BFA" />
             </View>
           </View>
 
@@ -283,14 +283,14 @@ function ItemRow({ item, onUpdate, onRemove }) {
           value={item.name}
           onChangeText={v => onUpdate(item.id, 'name', v)}
           placeholder="Aliment"
-          placeholderTextColor="#8892b0"
+          placeholderTextColor="#7A5540"
         />
         <TextInput
           style={styles.itemQtyInput}
           value={item.quantity}
           onChangeText={v => onUpdate(item.id, 'quantity', v)}
           placeholder="qté"
-          placeholderTextColor="#8892b0"
+          placeholderTextColor="#7A5540"
         />
         <Text style={styles.itemCals}>{Math.round(parseFloat(item.calories) || 0)} kcal</Text>
         <TouchableOpacity onPress={() => onRemove(item.id)} style={styles.removeBtn}>
@@ -302,10 +302,10 @@ function ItemRow({ item, onUpdate, onRemove }) {
       {expanded && (
         <View style={styles.itemMacros}>
           {[
-            { field: 'calories', label: 'Kcal',   color: '#e94560' },
-            { field: 'protein',  label: 'Prot. g', color: '#4ecdc4' },
-            { field: 'carbs',    label: 'Gluc. g', color: '#f7b731' },
-            { field: 'fat',      label: 'Lip. g',  color: '#a29bfe' },
+            { field: 'calories', label: 'Kcal',   color: '#E8291C' },
+            { field: 'protein',  label: 'Prot. g', color: '#4ECDC4' },
+            { field: 'carbs',    label: 'Gluc. g', color: '#F59E0B' },
+            { field: 'fat',      label: 'Lip. g',  color: '#A78BFA' },
           ].map(({ field, label, color }) => (
             <View key={field} style={styles.macroEditRow}>
               <Text style={[styles.macroEditLabel, { color }]}>{label}</Text>
@@ -336,71 +336,71 @@ function MacroBox({ label, value, unit, color, big }) {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f23' },
+  container: { flex: 1, backgroundColor: '#100800' },
   content: { padding: 20, paddingBottom: 40 },
 
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingTop: 8 },
-  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#16213e', alignItems: 'center', justifyContent: 'center' },
-  closeBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  headerTitle: { fontSize: 17, fontWeight: '700', color: '#fff' },
+  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#2C1810', alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { color: '#FFF5E8', fontSize: 16, fontWeight: '700' },
+  headerTitle: { fontSize: 17, fontWeight: '700', color: '#FFF5E8' },
 
   photoWrapper: { position: 'relative', marginBottom: 14 },
-  photo: { width: '100%', height: 200, borderRadius: 16, backgroundColor: '#16213e' },
-  confidenceBadge: { position: 'absolute', bottom: 10, right: 10, backgroundColor: 'rgba(15,15,35,0.85)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
+  photo: { width: '100%', height: 200, borderRadius: 16, backgroundColor: '#2C1810' },
+  confidenceBadge: { position: 'absolute', bottom: 10, right: 10, backgroundColor: 'rgba(16,8,0,0.85)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1 },
   confidenceText: { fontSize: 12, fontWeight: '700' },
 
-  mealNameInput: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 16, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#16213e' },
+  mealNameInput: { fontSize: 20, fontWeight: '800', color: '#FFF5E8', marginBottom: 16, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#3D2015' },
 
-  totalsCard: { backgroundColor: '#1a1a2e', borderRadius: 16, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#16213e' },
-  totalsTitle: { color: '#8892b0', fontSize: 12, marginBottom: 12 },
+  totalsCard: { backgroundColor: '#1E1008', borderRadius: 16, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#3D2015' },
+  totalsTitle: { color: '#C4956A', fontSize: 12, marginBottom: 12 },
   totalsRow: { flexDirection: 'row', justifyContent: 'space-between' },
   macroBox: { alignItems: 'center' },
   macroValue: { fontWeight: '800' },
   macroUnit: { fontSize: 11, fontWeight: '600', marginTop: -2 },
-  macroLabel: { color: '#8892b0', fontSize: 10, marginTop: 4 },
+  macroLabel: { color: '#C4956A', fontSize: 10, marginTop: 4 },
 
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, marginTop: 4 },
-  sectionLabel: { color: '#8892b0', fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10, marginTop: 4 },
-  addItemBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: '#e94560' },
-  addItemBtnText: { color: '#e94560', fontSize: 12, fontWeight: '700' },
+  sectionLabel: { color: '#C4956A', fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10, marginTop: 4 },
+  addItemBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: '#E8291C' },
+  addItemBtnText: { color: '#E8291C', fontSize: 12, fontWeight: '700' },
 
   // Item card
-  itemCard: { backgroundColor: '#1a1a2e', borderRadius: 12, marginBottom: 8, overflow: 'hidden', borderWidth: 1, borderColor: '#16213e' },
+  itemCard: { backgroundColor: '#1E1008', borderRadius: 12, marginBottom: 8, overflow: 'hidden', borderWidth: 1, borderColor: '#3D2015' },
   itemMain: { flexDirection: 'row', alignItems: 'center', padding: 10, gap: 6 },
   itemToggle: { width: 24, alignItems: 'center' },
-  expandIcon: { color: '#8892b0', fontSize: 10 },
-  itemNameInput: { flex: 1, color: '#fff', fontSize: 14, fontWeight: '600' },
-  itemQtyInput: { width: 55, color: '#8892b0', fontSize: 12, textAlign: 'center', backgroundColor: '#16213e', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 4 },
-  itemCals: { color: '#e94560', fontSize: 13, fontWeight: '700', minWidth: 55, textAlign: 'right' },
+  expandIcon: { color: '#C4956A', fontSize: 10 },
+  itemNameInput: { flex: 1, color: '#FFF5E8', fontSize: 14, fontWeight: '600' },
+  itemQtyInput: { width: 55, color: '#C4956A', fontSize: 12, textAlign: 'center', backgroundColor: '#2C1810', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 4 },
+  itemCals: { color: '#E8291C', fontSize: 13, fontWeight: '700', minWidth: 55, textAlign: 'right' },
   removeBtn: { padding: 4 },
-  removeBtnText: { color: '#8892b0', fontSize: 14 },
+  removeBtnText: { color: '#C4956A', fontSize: 14 },
 
-  itemMacros: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 12, borderTopWidth: 1, borderTopColor: '#16213e', backgroundColor: '#0f0f23' },
+  itemMacros: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 12, borderTopWidth: 1, borderTopColor: '#3D2015', backgroundColor: '#100800' },
   macroEditRow: { alignItems: 'center', gap: 4, minWidth: 70 },
   macroEditLabel: { fontSize: 11, fontWeight: '600' },
-  macroEditInput: { backgroundColor: '#1a1a2e', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, color: '#fff', fontSize: 15, fontWeight: '700', textAlign: 'center', minWidth: 70, borderWidth: 1, borderColor: '#16213e' },
+  macroEditInput: { backgroundColor: '#1E1008', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, color: '#FFF5E8', fontSize: 15, fontWeight: '700', textAlign: 'center', minWidth: 70, borderWidth: 1, borderColor: '#3D2015' },
 
   // Ajouts rapides
   quickAddsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
-  qaChip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#16213e', alignItems: 'center' },
-  qaChipActive: { borderColor: '#e94560', backgroundColor: '#1a0a10' },
-  qaLabel: { color: '#8892b0', fontSize: 13, fontWeight: '600' },
-  qaLabelActive: { color: '#e94560' },
-  qaCalories: { color: '#8892b0', fontSize: 10, marginTop: 2 },
-  qaCaloriesActive: { color: '#e94560' },
+  qaChip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, backgroundColor: '#1E1008', borderWidth: 1, borderColor: '#3D2015', alignItems: 'center' },
+  qaChipActive: { borderColor: '#E8291C', backgroundColor: '#2C1810' },
+  qaLabel: { color: '#C4956A', fontSize: 13, fontWeight: '600' },
+  qaLabelActive: { color: '#E8291C' },
+  qaCalories: { color: '#7A5540', fontSize: 10, marginTop: 2 },
+  qaCaloriesActive: { color: '#E8291C' },
 
-  noteBox: { backgroundColor: '#16213e', borderRadius: 10, padding: 12, marginBottom: 16 },
-  noteText: { color: '#8892b0', fontSize: 12, lineHeight: 18 },
+  noteBox: { backgroundColor: '#2C1810', borderRadius: 10, padding: 12, marginBottom: 16 },
+  noteText: { color: '#C4956A', fontSize: 12, lineHeight: 18 },
 
   mealTypeRow: { flexDirection: 'row', gap: 8, marginBottom: 24 },
-  mealChip: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#16213e' },
-  mealChipActive: { borderColor: '#e94560' },
+  mealChip: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12, backgroundColor: '#1E1008', borderWidth: 1, borderColor: '#3D2015' },
+  mealChipActive: { borderColor: '#E8291C' },
   mealEmoji: { fontSize: 18 },
-  mealLabel: { color: '#8892b0', fontSize: 11, marginTop: 4 },
-  mealLabelActive: { color: '#e94560' },
+  mealLabel: { color: '#C4956A', fontSize: 11, marginTop: 4 },
+  mealLabelActive: { color: '#E8291C' },
 
-  addBtn: { backgroundColor: '#e94560', padding: 18, borderRadius: 14, alignItems: 'center', marginBottom: 12 },
-  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  retryBtn: { padding: 14, borderRadius: 14, alignItems: 'center', borderWidth: 1, borderColor: '#16213e' },
-  retryBtnText: { color: '#8892b0', fontSize: 14 },
+  addBtn: { backgroundColor: '#E8291C', padding: 18, borderRadius: 14, alignItems: 'center', marginBottom: 12 },
+  addBtnText: { color: '#FFF5E8', fontWeight: '700', fontSize: 16 },
+  retryBtn: { padding: 14, borderRadius: 14, alignItems: 'center', borderWidth: 1, borderColor: '#3D2015' },
+  retryBtnText: { color: '#C4956A', fontSize: 14 },
 });
