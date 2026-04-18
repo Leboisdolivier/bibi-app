@@ -13,12 +13,12 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: "VOTRE_API_KEY",
-  authDomain: "votre-projet.firebaseapp.com",
-  projectId: "votre-projet-id",
-  storageBucket: "votre-projet.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123def456"
+  apiKey: "AIzaSyCc9qUv1yhcqSpJaCwb7LQ0BR5m4Lus6F8",
+  authDomain: "bibis-app.firebaseapp.com",
+  projectId: "bibis-app",
+  storageBucket: "bibis-app.firebasestorage.app",
+  messagingSenderId: "850978647378",
+  appId: "1:850978647378:web:d96c792ff96745ecbb1e8b"
 };
 
 // Vérifier si Firebase est configuré (mode démo si non configuré)

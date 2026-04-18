@@ -34,6 +34,16 @@
         "android.permission.RECORD_AUDIO"
       ]
     },
+    "web": {
+      "favicon": "./assets/bibis-icon.png",
+      "name": "BIBIS",
+      "shortName": "BIBIS",
+      "description": "BIBIS — Muscle Warrior · Fourques",
+      "themeColor": "#E8291C",
+      "backgroundColor": "#100800",
+      "display": "standalone",
+      "orientation": "portrait"
+    },
     "plugins": [
       [
         "expo-camera",
