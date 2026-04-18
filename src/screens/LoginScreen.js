@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, KeyboardAvoidingView, Platform,
-  Alert, ActivityIndicator,
+  Alert, ActivityIndicator, Image,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
@@ -58,7 +58,11 @@ export default function LoginScreen() {
     >
       {/* Logo */}
       <View style={styles.logoBox}>
-        <Text style={styles.logoText}>BIBIS</Text>
+        <Image
+          source={require('../../assets/bibis-icon.png')}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
         <Text style={styles.logoSub}>MUSCLE WARRIOR · FOURQUES</Text>
       </View>
 
@@ -127,8 +131,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
   },
-  logoBox: { alignItems: 'center', marginBottom: 40 },
-  logoText: { fontSize: 52, fontWeight: '900', color: '#E8291C', letterSpacing: -1 },
+  logoBox: { alignItems: 'center', marginBottom: 32 },
+  logoImage: { width: 160, height: 160, marginBottom: 8 },
   logoSub: { fontSize: 11, color: '#C4956A', letterSpacing: 3, textTransform: 'uppercase', marginTop: 4 },
 
   googleBtn: {
