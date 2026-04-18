@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a1a2e"
+      "backgroundColor": "#100800"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -23,7 +23,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/bibis-icon.png",
-        "backgroundColor": "#1a1a2e"
+        "backgroundColor": "#100800"
       },
       "package": "com.bibis.app",
       "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]

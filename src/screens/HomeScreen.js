@@ -12,7 +12,7 @@ export default function HomeScreen({ navigation }) {
       {/* Header Venice Beach */}
       <View style={styles.heroBanner}>
         <Text style={styles.heroTitle}>BIBIS</Text>
-        <Text style={styles.heroSub}>MUSCLE BEACH · VENICE</Text>
+        <Text style={styles.heroSub}>MUSCLE WARRIOR · FOURQUES</Text>
       </View>
 
       <Text style={styles.greeting}>Bonjour ! 👋</Text>

@@ -56,7 +56,7 @@ export default function LoginScreen() {
       {/* Logo BIBIS */}
       <View style={styles.logoBox}>
         <Text style={styles.logoText}>BIBIS</Text>
-        <Text style={styles.logoSub}>MUSCLE BEACH · VENICE</Text>
+        <Text style={styles.logoSub}>MUSCLE WARRIOR · FOURQUES</Text>
       </View>
 
       <Text style={styles.subtitle}>
