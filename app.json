@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#100800"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bibis.app",
@@ -26,7 +28,11 @@
         "backgroundColor": "#100800"
       },
       "package": "com.bibis.app",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [
@@ -41,6 +47,11 @@
           "photosPermission": "Autoriser l'accès aux photos pour ajouter des images de repas"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2227847d-1727-4da3-808d-7bcf5a21ed6c"
+      }
+    }
   }
 }
