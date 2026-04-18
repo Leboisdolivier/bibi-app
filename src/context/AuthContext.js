@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
 } from 'firebase/auth';
@@ -25,11 +26,13 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // Récupère le résultat du redirect Google si on revient d'une auth Google
-    getRedirectResult(auth).catch(() => {});
+    // Récupère le résultat si on revient d'un redirect Google
+    getRedirectResult(auth)
+      .then(result => { if (result?.user) setUser(result.user); })
+      .catch(() => {});
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
       setLoading(false);
     });
     return unsubscribe;
@@ -45,9 +48,18 @@ export function AuthProvider({ children }) {
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
+  // Popup d'abord (sans rechargement de page), redirect en fallback si popup bloqué
   const signInWithGoogle = async () => {
     if (!auth) throw new Error('Firebase non configuré');
-    return signInWithRedirect(auth, googleProvider);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
+        await signInWithRedirect(auth, googleProvider);
+      } else {
+        throw err;
+      }
+    }
   };
 
   const signOut = async () => {

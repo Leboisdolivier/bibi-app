@@ -20,12 +20,12 @@ function MainTabs() {
   return (
     <Tab.Navigator
           screenOptions={{
-            headerStyle: { backgroundColor: '#1a1a2e' },
-            headerTintColor: '#e94560',
-            headerTitleStyle: { fontWeight: 'bold', fontSize: 20 },
-            tabBarStyle: { backgroundColor: '#1a1a2e', borderTopColor: '#16213e' },
-            tabBarActiveTintColor: '#e94560',
-            tabBarInactiveTintColor: '#8892b0',
+            headerStyle: { backgroundColor: '#1E1008' },
+            headerTintColor: '#E8291C',
+            headerTitleStyle: { fontWeight: '900', fontSize: 20 },
+            tabBarStyle: { backgroundColor: '#1E1008', borderTopColor: '#3D2015' },
+            tabBarActiveTintColor: '#E8291C',
+            tabBarInactiveTintColor: '#C4956A',
           }}
         >
           <Tab.Screen
@@ -91,5 +91,5 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, backgroundColor: '#0f0f23', justifyContent: 'center', alignItems: 'center' },
+  loading: { flex: 1, backgroundColor: '#100800', justifyContent: 'center', alignItems: 'center' },
 });
